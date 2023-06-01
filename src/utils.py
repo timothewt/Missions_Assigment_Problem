@@ -44,3 +44,18 @@ def open_centers_csv(path_to_csv: str):
 		for row in reader:
 			centers.append(Center(int(row[0]), row[1]))
 	return centers
+
+
+def open_distances_matrix(path_to_csv: str):
+	"""
+	Opens the distances matrix csv file and returns the matrix
+	:param path_to_csv: path to the csv file
+	:return: list of lists
+	"""
+	distances = []
+	with open(path_to_csv, newline='') as csvfile:
+		reader = csv.reader(csvfile)
+		for row in reader:
+			distances.append([float(x) for x in row])
+	return distances
+	
