@@ -4,7 +4,7 @@ from models.mission import Mission
 from models.center import Center
 from config import *
 from copy import deepcopy
-from random import choice
+from random import choice, random
 
 
 def get_nearest_neighbour_solution(employees: list[Employee], missions: list[Mission], centers: list[Center], distance_matrix: list[list[float]]) -> Solution:
@@ -70,7 +70,69 @@ def generate_initial_population(employees: list[Employee], missions: list[Missio
 	return solutions
 
 
-def genetic_algorithm_iteration(population: list[Solution], distance_matrix: list[list[float]]) -> Solution:
+def crossover(solution1: Solution, solution2: Solution) -> list[Solution|Solution]:
+	"""
+	Performs a crossover between two solutions using uniform crossover
+	:param solution1: first solution
+	:param solution2: second solution
+	:return: two children solutions
+	"""
+	size = len(solution1.assignments)
+	mask = [round(random()) for _ in range(size)]
+	child1 = Solution(size)
+	child2 = Solution(size)
+
+	for i in range(size):
+		child1.assignments[i] = mask[i] * solution1.assignments[i] + (1 - mask[i]) * solution2.assignments[i]
+		child2.assignments[i] = mask[i] * solution2.assignments[i] + (1 - mask[i]) * solution1.assignments[i]
+
+	return child1, child2
+
+
+def tournament_choice(population: list[Solution], k: int) -> list[Solution|Solution]:
+	"""
+	Performs a tournament iteration 
+	:param population: list of solutions
+	:param k: number of solutions to pick
+	:return: list of solutions
+	"""
+	solutions = [None] * k
+	for i in range(k):
+		solutions[i] = choice(population)
+
+	return pick_best_solution(solutions)
+
+
+def pick_best_solution(solutions: list[Solution]) -> Solution:
+	"""
+	Picks the best solution in a list using cascade sorting
+	:param solutions: solutions from which we pick the best
+	:return: the best solution in the list
+	"""
+	size: int = len(solutions)
+
+	solutions.sort(key=lambda x: x.get_fitness_1(), reverse=True)  # first sorts by assignment number fitness
+	for i in range(size - 1, 0, -1):
+		if solutions[i].get_fitness_1() < solutions[0].get_fitness_1():  # eliminates all the solutions with a smaller assignments number
+			break
+		solutions.pop()
+
+	solutions.sort(key=lambda x: x.get_fitness_2())  # then sorts by travel cost of employees
+	for i in range(size - 1, 0, -1):
+		if solutions[i].get_fitness_2() < solutions[0].get_fitness_2():  # eliminates all the solutions with a bigger travel cost
+			break
+		solutions.pop()
+
+	solutions.sort(key=lambda x: x.get_fitness_3(), reverse=True)  # finally sorts by corresponding speciality assignments number
+	for i in range(size - 1, 0, -1):
+		if solutions[i].get_fitness_3() < solutions[0].get_fitness_3():  # eliminates all the solutions with a smaller corresponding speciality assignments number
+			break
+		solutions.pop()
+	
+	return choice(solutions)  # if there are more than one solution remaining, picks a random one to add diversity
+
+
+def genetic_algorithm_iteration(population: list[Solution], distance_matrix: list[list[float]], size: int) -> Solution:
 
 	new_population: list[Solution] = []
 
