@@ -1,7 +1,11 @@
 from utils import *
 
+
 if __name__ == "__main__":
-	print(open_missions_csv("../instances/30Missions-2centres/missions.csv"))
-	print(open_centers_csv("../instances/30Missions-2centres/centers.csv"))
-	print(open_employees_csv("../instances/30Missions-2centres/employees.csv"))
-	print(open_distances_matrix("../instances/30Missions-2centres/distances.csv"))
+	
+	missions_nb, centers_nb = prompt_instance_parameters()
+
+	instance_path = f"../instances/{missions_nb}Missions-{centers_nb}centres/"
+
+	print(instance_path)
+	
