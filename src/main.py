@@ -23,5 +23,4 @@ if __name__ == "__main__":
 	print(f"\nNumber of missions assigned: {solution.get_fitness_1()}")
 	print(f"Total distance traveled: {solution.get_fitness_2(distance_matrix)}")
 	print(f"Number of corresponding specialities: {solution.get_fitness_3()}")
-
-	solution.is_valid(employees, missions)
+	

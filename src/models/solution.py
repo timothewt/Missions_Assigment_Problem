@@ -36,12 +36,15 @@ class Solution:
 		is_valid = True
 		for i, mission in enumerate(missions):
 			employees[self.assignments[i] - 1].schedule.add_mission(mission)
+
 		for i, employee in enumerate(employees):
 			if not employee.schedule.is_valid():
 				is_valid = False
 				break
+
 		for employee in employees:
 			employee.reset_schedule()
+			
 		return is_valid
 
 

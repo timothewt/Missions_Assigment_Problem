@@ -40,7 +40,6 @@ def get_nearest_neighbour_solution(employees: list[Employee], missions: list[Mis
 	for mission_index, mission in enumerate(missions):
 		employees_distances_from_missions = [float('inf') for _ in range(len(employees))]
 
-		
 		for employee_index, employee in enumerate(employees):
 
 			if employee.skill != mission.skill:  # if the skill does not match, does not consider this employee
@@ -54,11 +53,10 @@ def get_nearest_neighbour_solution(employees: list[Employee], missions: list[Mis
 				distance_from_last_mission = distance_matrix[centers_nb + last_mission.id - 1][centers_nb + mission.id - 1]
 				travel_time_from_last_mission = distance_from_last_mission * TRAVEL_SPEED
 
-				if last_mission.start_time <= mission.end_time and (last_mission.end_time + travel_time_from_last_mission) >= mission.start_time:  # if the employee cannot make it before the end of its last mission, does not consider him
+				if (last_mission.end_time + travel_time_from_last_mission) >= mission.start_time:  # if the employee cannot make it before the end of its last mission, does not consider him
 					continue
 
 				employees_distances_from_missions[employee_index] = distance_from_last_mission
-
 
 		if (min_distance := min(employees_distances_from_missions)) == float('inf'):  # if no employee can make it to the mission, the mission is not assigned
 			continue
