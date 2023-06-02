@@ -1,3 +1,6 @@
+from models.schedule import Schedule
+
+
 class Employee:
 	id: int
 	center_id: str
@@ -6,11 +9,12 @@ class Employee:
 	schedule: Schedule
 
 
-	def __init__(self, id: int, center_id: str, skill: str, speciality: str):
+	def __init__(self, id: int, center_id: str, skill: str, speciality: str, schedule: Schedule = Schedule()):
 		self.id = id
 		self.center_id = center_id
 		self.skill = skill
 		self.speciality = speciality
+		self.schedule = schedule
 	
 
 	def __str__(self):

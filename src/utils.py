@@ -1,59 +1,61 @@
 import csv
+import operator
 from models.mission import Mission
 from models.employee import Employee
 from models.center import Center
 
 
-def open_missions_csv(path_to_csv: str) -> list[Mission]:
+def open_missions_csv(path_to_folder: str) -> list[Mission]:
 	"""
 	Opens the missions csv file and returns a list of missions
-	:param path_to_csv: path to the csv file
+	:param path_to_folder: path to the folder of the csv file
 	:return: list of missions
 	"""
 	missions = []
-	with open(path_to_csv, newline='') as csvfile:
+	with open(path_to_folder + "missions.csv", newline='') as csvfile:
 		reader = csv.reader(csvfile)
 		for row in reader:
 			missions.append(Mission(int(row[0]), int(row[1]), int(row[2]), int(row[3]), row[4], row[5]))
+	missions.sort(key=operator.attrgetter('day', 'start_time'))
 	return missions
 
 
-def open_employees_csv(path_to_csv: str) -> list[Employee]:
+def open_employees_csv(path_to_folder: str) -> list[Employee]:
 	"""
 	Opens the employees csv file and returns a list of employees
-	:param path_to_csv: path to the csv file
+	:param path_to_folder: path to the csv file
 	:return: list of employees
 	"""
 	employees = []
-	with open(path_to_csv, newline='') as csvfile:
+	with open(path_to_folder + "employees.csv", newline='') as csvfile:
 		reader = csv.reader(csvfile)
 		for row in reader:
 			employees.append(Employee(int(row[0]), row[1], row[2], row[3]))
 	return employees
 
 
-def open_centers_csv(path_to_csv: str) -> list[Center]:
+def open_centers_csv(path_to_folder: str) -> list[Center]:
 	"""
 	Opens the centers csv file and returns a list of centers
-	:param path_to_csv: path to the csv file
+	:param path_to_folder: path to the csv file
 	:return: list of centers
 	"""
 	centers = []
-	with open(path_to_csv, newline='') as csvfile:
+	with open(path_to_folder + "centers.csv", newline='') as csvfile:
 		reader = csv.reader(csvfile)
 		for row in reader:
 			centers.append(Center(int(row[0]), row[1]))
 	return centers
 
 
-def open_distances_matrix(path_to_csv: str) -> list[list[float]]:
+def open_distances_matrix(path_to_folder: str) -> list[list[float]]:
 	"""
 	Opens the distances matrix csv file and returns the matrix
-	:param path_to_csv: path to the csv file
+	:param path_to_folder: path to the csv file
 	:return: list of lists
 	"""
 	distances = []
-	with open(path_to_csv, newline='') as csvfile:
+	with open(path_to_folder + "distances.csv", newline='') as csvfile:
 		reader = csv.reader(csvfile)
 		for row in reader:
 			distances.append([float(x) for x in row])

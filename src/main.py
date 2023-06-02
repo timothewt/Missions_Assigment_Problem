@@ -7,5 +7,5 @@ if __name__ == "__main__":
 
 	instance_path = f"../instances/{missions_nb}Missions-{centers_nb}centres/"
 
-	print(instance_path)
+	print(open_missions_csv(instance_path))
 	

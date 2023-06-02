@@ -1,4 +1,4 @@
-from mission import Mission
+from models.mission import Mission
 
 
 class Schedule:

@@ -1,7 +1,7 @@
 class Mission:
 	id: int
 	day: int
-	start_time: float  # in hours
+	start_time: float  # in minutes
 	end_time: float
 	skill: str
 	speciality: str
@@ -17,7 +17,7 @@ class Mission:
 
 
 	def __str__(self):
-		return f"{self.id}: Day {self.day} at {self.start_time}h-{self.end_time}h, {self.skill}, {self.speciality}"
+		return f"{self.id}: Day {self.day} at {round(self.start_time / 60, 2)}h-{round(self.end_time / 60, 2)}h, {self.skill}, {self.speciality}"
 
 
 	def __repr__(self):
