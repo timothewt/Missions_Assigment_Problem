@@ -26,7 +26,9 @@ if __name__ == "__main__":
 	for i in range(len(solution.assignments)):
 		print("Mission", missions[i].speciality, "is assigned to employee", employees[solution.assignments[i] - 1].speciality)
 
-	print(f"\nNumber of missions assigned: {solution.get_fitness_1()}")
-	print(f"Total distance traveled: {solution.get_fitness_2(distance_matrix)}")
-	print(f"Number of corresponding specialities: {solution.get_fitness_3(employees, missions)}")
+	evaluation = solution.evaluate(employees, missions, distance_matrix)
+
+	print(f"\nNumber of missions assigned: {evaluation[0]}")
+	print(f"Total distance traveled: {evaluation[1]}")
+	print(f"Number of corresponding specialities: {evaluation[2]}")
 	

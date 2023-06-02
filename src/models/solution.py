@@ -3,14 +3,22 @@ from models.mission import Mission
 
 
 class Solution:
-	assignments: list[int]
+	"""
+	Represents a solution to the assigment problem, and an individual for the genetic algorithm
+	"""
 	
+	assignments: list[int]  # list of the assignments of the missions to the employees, assigments[i] is the id of the employee assigned to mission i
 
-	def __init__(self, size: int):
+
+	def __init__(self, size: int) -> None:
 		self.assignments = [0] * size
 
 
 	def get_fitness_1(self) -> float:
+		"""
+		Computes the fitness corresponding to the number of missions assigned
+		:return: the number of missions assigned
+		"""
 		count = len(self.assignments)
 		for assigned_employee_id in self.assignments:
 			if assigned_employee_id == 0:
@@ -19,6 +27,11 @@ class Solution:
 
 
 	def get_fitness_2(self, distance_matrix: list[list[float]]) -> float:
+		"""
+		Computes the distance fitness, i.e. the total distance traveled
+		:param distance_matrix: the distance matrix
+		:return: the distance fitness
+		"""
 
 
 		return 0
@@ -44,10 +57,10 @@ class Solution:
 		"""
 		count = len(self.assignments)
 		for mission_index, assigned_employee_id in enumerate(self.assignments):
-			if assigned_employee_id == 0:
+			if assigned_employee_id == 0:  # mission not assigned
 				count -= 1
 				continue
-			if employees[assigned_employee_id - 1].speciality != next((mission for mission in missions if mission.id == mission_index + 1), None).speciality:
+			if employees[assigned_employee_id - 1].speciality != next((mission for mission in missions if mission.id == mission_index + 1), None).speciality:  # the second part of the boolean expression is to get the mission corresponding to the mission index (which is the mission id - 1)
 				count -= 1
 		return count
 
@@ -55,8 +68,17 @@ class Solution:
 	def mutate(self) -> None:
 		pass
 
-	def evaluate(self) -> list[float]:
-		return 0
+
+	def evaluate(self, distance_matrix: list[list[float]], employees: list[Employee], missions: list[Mission]) -> list[float|float|float]:
+		"""
+		Evaluates the solution, i.e. computes the fitnesses
+		:param distance_matrix: the distance matrix
+		:param employees: the employees
+		:param missions: the missions
+		:return: the list of the fitnesses
+		"""
+		return self.get_fitness_1(), self.get_fitness_2(distance_matrix), self.get_fitness_3(employees, missions)
+
 
 	def is_valid(self, employees: list[Employee], missions: list[Mission]) -> bool:
 		"""
@@ -80,9 +102,9 @@ class Solution:
 		return is_valid
 
 
-	def __str__(self):
+	def __str__(self) -> str:
 		return f"{self.assignments}"
 
 
-	def __repr__(self):
+	def __repr__(self) -> str:
 		return self.__str__()

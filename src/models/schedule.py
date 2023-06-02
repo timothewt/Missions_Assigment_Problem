@@ -2,15 +2,19 @@ from models.mission import Mission
 
 
 class Schedule:
-	missions: list[Mission]  # we keep the list sorted by day and start_hour
+	"""
+	Represents the schedule of an employee (his assigned missions)
+	"""
+	
+	missions: list[Mission]  # list of the employee's missions, we keep the list sorted by day and start_hour
 
-	def __init__(self, missions: list[Mission] = None):
+	def __init__(self, missions: list[Mission] = None) -> None:
 		if missions is None:
 			missions = []
 		self.missions = missions
 
 
-	def reset_schedule(self):
+	def reset_schedule(self) -> None:
 		"""
 		Resets the schedule
 		"""
@@ -52,9 +56,9 @@ class Schedule:
 		return True
 
 
-	def __str__(self):
+	def __str__(self) -> str:
 		return f"{self.missions}"
 
 
-	def __repr__(self):
+	def __repr__(self) -> str:
 		return self.__str__()
