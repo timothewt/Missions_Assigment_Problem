@@ -4,7 +4,7 @@ from models.employee import Employee
 from models.center import Center
 
 
-def open_missions_csv(path_to_csv: str):
+def open_missions_csv(path_to_csv: str) -> list[Mission]:
 	"""
 	Opens the missions csv file and returns a list of missions
 	:param path_to_csv: path to the csv file
@@ -18,7 +18,7 @@ def open_missions_csv(path_to_csv: str):
 	return missions
 
 
-def open_employees_csv(path_to_csv: str):
+def open_employees_csv(path_to_csv: str) -> list[Employee]:
 	"""
 	Opens the employees csv file and returns a list of employees
 	:param path_to_csv: path to the csv file
@@ -32,7 +32,7 @@ def open_employees_csv(path_to_csv: str):
 	return employees
 
 
-def open_centers_csv(path_to_csv: str):
+def open_centers_csv(path_to_csv: str) -> list[Center]:
 	"""
 	Opens the centers csv file and returns a list of centers
 	:param path_to_csv: path to the csv file
@@ -46,7 +46,7 @@ def open_centers_csv(path_to_csv: str):
 	return centers
 
 
-def open_distances_matrix(path_to_csv: str):
+def open_distances_matrix(path_to_csv: str) -> list[list[float]]:
 	"""
 	Opens the distances matrix csv file and returns the matrix
 	:param path_to_csv: path to the csv file
@@ -61,6 +61,10 @@ def open_distances_matrix(path_to_csv: str):
 	
 
 def prompt_instance_parameters() -> list[int|int]:
+	"""
+	Prompts the user to choose an instance and returns the number of missions and centers
+	:return: list of missions number and centers number
+	"""
 	missions_nb = [100, 200, 30, 66, 94, 94]
 	centers_nb = [2, 2, 2, 2, 2, 3]
 
