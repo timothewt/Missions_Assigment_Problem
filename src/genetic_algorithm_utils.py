@@ -8,11 +8,12 @@ from models.mission import Mission
 from models.center import Center
 
 
-def generate_initial_population(employees: list[Employee], missions: list[Mission], distance_matrix: list[list[float]], size: int) -> list[Solution]:
+def generate_initial_population(employees: list[Employee], missions: list[Mission], centers: list[Center], distance_matrix: list[list[float]], size: int) -> list[Solution]:
 	"""
 	Generates an initial population of solutions
 	:param employees: list of employees
 	:param missions: list of missions
+	:param centers: list of centers
 	:param distance_matrix: matrix of distances between center-center, centers-missions, missions-missions
 	:param size: size of the population
 	:return: list of valid solutions
@@ -20,7 +21,7 @@ def generate_initial_population(employees: list[Employee], missions: list[Missio
 	solutions = [None] * size
 	for i in range(size):
 		# as the nearest neighbour function has random choices, the population will be diverse enough
-		solutions[i] = get_nearest_neighbour_solution(employees, missions, distance_matrix)
+		solutions[i] = get_nearest_neighbour_solution(employees, missions, centers, distance_matrix)
 	
 	return solutions
 

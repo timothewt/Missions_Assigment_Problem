@@ -31,7 +31,7 @@ def genetic_algorithm_iteration(population: list[Solution], distance_matrix: lis
 	return pick_best_solutions(population, distance_matrix, size)
 
 
-def genetic_algorithm(employees: list[Employee], missions: list[Mission], distance_matrix: list[list[float]], size: int, crossover_rate: float, mutation_rate: float, max_execution_time: int) -> Solution:
+def genetic_algorithm(employees: list[Employee], missions: list[Mission], centers: list[Center], distance_matrix: list[list[float]], size: int, crossover_rate: float, mutation_rate: float, max_execution_time: int) -> Solution:
 	"""
 	Performs the genetic algorithm
 	:param employees: list of employees to assign to missions
@@ -44,7 +44,7 @@ def genetic_algorithm(employees: list[Employee], missions: list[Mission], distan
 	:return: the best solution of the population
 	"""
 	start_time = time()
-	population = generate_initial_population(employees, missions, distance_matrix, size)
+	population = generate_initial_population(employees, missions, centers, distance_matrix, size)
 	while time() - start_time < max_execution_time:
 		population = genetic_algorithm_iteration(population, distance_matrix, size, crossover_rate, mutation_rate)
 
