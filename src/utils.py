@@ -81,3 +81,58 @@ def prompt_instance_parameters() -> list[int|int]:
 
 	return [missions_nb[instance_id - 1], centers_nb[instance_id - 1]]
 	
+
+def prompt_genetic_algorithm_parameters(default_size: int, default_crossover_rate: float, default_mutation_rate: float, default_max_time: float, default_k: int) -> list[int|float|float|float|int]:
+	"""
+	Prompts the user to choose the parameters of the genetic algorithm and returns them
+	These are : population size, crossover rate, mutation rate, max execution time, k (number of solutions picked for a tournament)
+	:return: list of parameters
+	"""
+	print("Default parameters:")
+	print("Population size:", default_size)
+	print("Crossover rate:", default_crossover_rate)
+	print("Mutation rate:", default_mutation_rate)
+	print("Max execution time:", default_max_time)
+	print("Number of individuals to pick for a tournament:", default_k)
+	print("Do you want to input custom parameters or keep the default one (C: custom/D: default) ?")
+	choice = input(">>> ")
+	while choice != 'C' and choice != 'c' and choice != 'D' and choice != 'd':
+		print("Please enter a valid choice (C: custom/D: default):")
+		choice = input(">>> ")
+
+	if choice == "D" or choice == "d":
+		return default_size, default_crossover_rate, default_mutation_rate, default_max_time, default_k
+
+	print("Please enter the parameters of the genetic algorithm:")
+
+	print('Population size:')
+	size = int(input(">>> "))
+	while size < 0:
+		print("Please enter a valid population size (positive integer):")
+		size = int(input(">>> "))
+
+	print('Crossover rate:')
+	crossover_rate = float(input(">>> "))
+	while crossover_rate < 0 or crossover_rate > 1:
+		print("Please enter a valid crossover rate (between 0 and 1):")
+		crossover_rate = float(input(">>> "))
+
+	print('Mutation rate:')
+	mutation_rate = float(input(">>> "))
+	while mutation_rate < 0 or mutation_rate > 1:
+		print("Please enter a valid mutation rate (between 0 and 1):")
+		mutation_rate = float(input(">>> "))
+
+	print('Max execution time (in seconds):')
+	max_execution_time = float(input(">>> "))
+	while max_execution_time < 0:
+		print("Please enter a valid max execution time (positive float):")
+		max_execution_time = float(input(">>> "))
+
+	print('Number of best individuals to pick for a tournament:')
+	k = int(input(">>> "))
+	while k < 0:
+		print("Please enter a valid number (positive integer):")
+		k = int(input(">>> "))
+
+	return size, crossover_rate, mutation_rate, max_execution_time, k
