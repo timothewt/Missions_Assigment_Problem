@@ -23,23 +23,23 @@ def get_nearest_neighbour_solution(employees: list[Employee], missions: list[Mis
 		
 		for employee_index, employee in enumerate(employees):
 		
-			if employee.skill != mission.skill:
+			if employee.skill != mission.skill:  # if the skill does not match, does not consider this employee
 				continue
 		
-			if employee.schedule.is_empty_for_day(mission.day):
+			if employee.schedule.is_empty_for_day(mission.day):  # if the employee has no mission for the current day, he starts from its center
 				employees_distances_from_missions[employee_index] = distance_matrix[employee.center_id - 1][centers_nb + mission_index]
-			else:
+			else:  # gets the distance from the last mission of the employee
 				distance_from_last_mission = distance_matrix[centers_nb + employee.schedule.missions[-1].id - 1][centers_nb + mission_index]
 				travel_time_from_last_mission = distance_from_last_mission * TRAVEL_SPEED
 
-				if employee.schedule.missions[-1].end_time + travel_time_from_last_mission < mission.start_time:
+				if employee.schedule.missions[-1].end_time + travel_time_from_last_mission < mission.start_time:  # if the employee cannot make it before the end of its last mission, does not consider him
 					continue
 
 				employees_distances_from_missions[employee_index] = distance_from_last_mission
 
 
 		min_distance = float('inf')
-		nearest_employees_indices = []
+		nearest_employees_indices = []  # finds the indices of all the closest employees from the mission
 
 		for employee_index, employee_distance in enumerate(employees_distances_from_missions):
 			if employee_distance < min_distance:
@@ -48,7 +48,7 @@ def get_nearest_neighbour_solution(employees: list[Employee], missions: list[Mis
 			elif employee_distance == min_distance:
 				nearest_employees_indices.append(employee_index)
 
-		solution.assignments[mission.id - 1] = employees[choice(nearest_employees_indices)].id
+		solution.assignments[mission.id - 1] = employees[choice(nearest_employees_indices)].id  # picks a random employee from the closest one to add diversity
 
 	return solution
 
@@ -64,6 +64,7 @@ def generate_initial_population(employees: list[Employee], missions: list[Missio
 	"""
 	solutions = [None] * size
 	for i in range(size):
+		# as the nearest neighbour function has random choices, the population will be diverse enough
 		solutions[i] = get_nearest_neighbour_solution(employees, missions, distance_matrix)
 	
 	return solutions
