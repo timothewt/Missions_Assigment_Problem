@@ -17,6 +17,10 @@ class Employee:
 		self.schedule = schedule
 	
 
+	def reset_schedule(self):
+		self.schedule = Schedule()
+
+
 	def __str__(self):
 		return f"{self.id}: {self.skill}, {self.speciality}"
 

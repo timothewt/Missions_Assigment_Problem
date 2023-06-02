@@ -21,6 +21,9 @@ class Solution:
 	def mutate(self) -> None:
 		pass
 
+	def is_valid(self):
+		return True
+
 
 	def __str__(self):
 		return f"{self.assignments}"
