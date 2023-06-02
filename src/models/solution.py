@@ -9,7 +9,7 @@ class Solution:
 		return 0
 
 
-	def get_fitness_2(self) -> float:
+	def get_fitness_2(self, distance_matrix: list[list[float]]) -> float:
 		return 0
 
 
@@ -17,7 +17,7 @@ class Solution:
 		return 0
 
 
-	def mutate(self): None:
+	def mutate(self) -> None:
 		pass
 
 
