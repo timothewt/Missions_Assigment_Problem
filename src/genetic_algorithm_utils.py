@@ -22,7 +22,7 @@ def generate_initial_population(employees: list[Employee], missions: list[Missio
 	for i in range(size):
 		# as the nearest neighbour function has random choices, the population will be diverse enough
 		solutions[i] = get_nearest_neighbour_solution(employees, missions, centers, distance_matrix)
-	
+
 	return solutions
 
 
@@ -39,35 +39,41 @@ def get_nearest_neighbour_solution(employees: list[Employee], missions: list[Mis
 
 	for mission_index, mission in enumerate(missions):
 		employees_distances_from_missions = [float('inf') for _ in range(len(employees))]
+
 		
 		for employee_index, employee in enumerate(employees):
-		
+
 			if employee.skill != mission.skill:  # if the skill does not match, does not consider this employee
 				continue
 		
 			if employee.schedule.is_empty_for_day(mission.day):  # if the employee has no mission for the current day, he starts from its center
-				employees_distances_from_missions[employee_index] = distance_matrix[employee.center_id - 1][centers_nb + mission_index]
+				employees_distances_from_missions[employee_index] = distance_matrix[employee.center_id - 1][centers_nb + mission.id - 1]
 			else:  # gets the distance from the last mission of the employee
-				distance_from_last_mission = distance_matrix[centers_nb + employee.schedule.missions[-1].id - 1][centers_nb + mission_index]
+				last_mission = employee.schedule.missions[-1]
+
+				distance_from_last_mission = distance_matrix[centers_nb + last_mission.id - 1][centers_nb + mission.id - 1]
 				travel_time_from_last_mission = distance_from_last_mission * TRAVEL_SPEED
 
-				if employee.schedule.missions[-1].end_time + travel_time_from_last_mission < mission.start_time:  # if the employee cannot make it before the end of its last mission, does not consider him
+				if last_mission.start_time <= mission.end_time and (last_mission.end_time + travel_time_from_last_mission) >= mission.start_time:  # if the employee cannot make it before the end of its last mission, does not consider him
 					continue
 
 				employees_distances_from_missions[employee_index] = distance_from_last_mission
 
 
-		min_distance = float('inf')
-		nearest_employees_indices = []  # finds the indices of all the closest employees from the mission
+		if (min_distance := min(employees_distances_from_missions)) == float('inf'):  # if no employee can make it to the mission, the mission is not assigned
+			continue
+		else:
+			nearest_employees_indices = []  # finds the indices of all the closest employees from the mission
+			for employee_index, employee_distance in enumerate(employees_distances_from_missions):
+				if employee_distance == min_distance:
+					nearest_employees_indices.append(employee_index)
 
-		for employee_index, employee_distance in enumerate(employees_distances_from_missions):
-			if employee_distance < min_distance:
-				min_distance = employee_distance
-				nearest_employees_indices = [employee_index]
-			elif employee_distance == min_distance:
-				nearest_employees_indices.append(employee_index)
+			picked_employee =  employees[choice(nearest_employees_indices)]
+			solution.assignments[mission.id - 1] = picked_employee.id  # picks a random employee from the closest one to add diversity
+			picked_employee.schedule.add_mission(mission)
 
-		solution.assignments[mission.id - 1] = employees[choice(nearest_employees_indices)].id  # picks a random employee from the closest one to add diversity
+	for employee in employees:
+		employee.reset_schedule()
 
 	return solution
 

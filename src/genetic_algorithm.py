@@ -2,9 +2,11 @@ from time import time
 from models.solution import Solution
 from genetic_algorithm_utils import *
 
-def genetic_algorithm_iteration(population: list[Solution], distance_matrix: list[list[float]], size: int, crossover_rate: float, mutation_rate: float) -> list[Solution]:
+def genetic_algorithm_iteration(employees: list[Employee], missions: list[Mission], population: list[Solution], distance_matrix: list[list[float]], size: int, crossover_rate: float, mutation_rate: float) -> list[Solution]:
 	"""
 	Performs a single iteration of the genetic algorithm
+	:param employees: list of employees to assign to missions
+	:param missions: list of missions to assign to employees
 	:param population: list of solutions
 	:param distance_matrix: matrix of distances between center-center, centers-missions, missions-missions
 	:param size: size of the population
@@ -23,9 +25,9 @@ def genetic_algorithm_iteration(population: list[Solution], distance_matrix: lis
 		if random() < mutation_rate:
 			child2.mutate()
 
-		if child1.is_valid():
+		if child1.is_valid(employees, missions):
 			population.append(child1)
-		if child2.is_valid():
+		if child2.is_valid(employees, missions):
 			population.append(child2)
 
 	return pick_best_solutions(population, distance_matrix, size)
@@ -46,6 +48,6 @@ def genetic_algorithm(employees: list[Employee], missions: list[Mission], center
 	start_time = time()
 	population = generate_initial_population(employees, missions, centers, distance_matrix, size)
 	while time() - start_time < max_execution_time:
-		population = genetic_algorithm_iteration(population, distance_matrix, size, crossover_rate, mutation_rate)
+		population = genetic_algorithm_iteration(employees, missions, population, distance_matrix, size, crossover_rate, mutation_rate)
 
 	return pick_best_solutions(population, distance_matrix, 1)[0]

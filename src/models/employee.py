@@ -9,16 +9,18 @@ class Employee:
 	schedule: Schedule
 
 
-	def __init__(self, id: int, center_id: str, skill: str, speciality: str, schedule: Schedule = Schedule()):
+	def __init__(self, id: int, center_id: str, skill: str, speciality: str, schedule: Schedule = None):
 		self.id = id
 		self.center_id = center_id
 		self.skill = skill
 		self.speciality = speciality
+		if schedule is None:
+			schedule = Schedule()
 		self.schedule = schedule
 	
 
 	def reset_schedule(self):
-		self.schedule = Schedule()
+		self.schedule.reset_schedule()
 
 
 	def __str__(self):
