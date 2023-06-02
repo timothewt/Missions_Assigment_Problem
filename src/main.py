@@ -13,4 +13,4 @@ if __name__ == "__main__":
 	centers = open_centers_csv(instance_path)
 	distance_matrix = open_distances_matrix(instance_path)
 
-	print(get_nearest_neighbour_solution(employees, missions, centers, distance_matrix))
+	solution = genetic_algorithm(employees, missions, distance_matrix, size=100, crossover_rate=0.8, mutation_rate=0.1, max_execution_time=10)
