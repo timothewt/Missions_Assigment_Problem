@@ -1,5 +1,6 @@
 from models.employee import Employee
 from models.mission import Mission
+from utils import *
 
 
 class Solution:
@@ -60,7 +61,7 @@ class Solution:
 			if assigned_employee_id == 0:  # mission not assigned
 				count -= 1
 				continue
-			if employees[assigned_employee_id - 1].speciality != next((mission for mission in missions if mission.id == mission_index + 1), None).speciality:  # the second part of the boolean expression is to get the mission corresponding to the mission index (which is the mission id - 1)
+			if employees[assigned_employee_id - 1].speciality != get_missions_by_id(missions, mission_index + 1).speciality:  # the second part of the boolean expression is to get the mission corresponding to the mission index (which is the mission id - 1)
 				count -= 1
 		return count
 
@@ -89,7 +90,7 @@ class Solution:
 		"""
 		is_valid = True
 		for i, mission in enumerate(missions):
-			employees[self.assignments[i] - 1].schedule.add_mission(mission)
+			employees[self.assignments[i] - 1].schedule.add_mission(get_missions_by_id(missions, i + 1))
 
 		for i, employee in enumerate(employees):
 			if not employee.schedule.is_valid():

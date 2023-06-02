@@ -13,7 +13,7 @@ if __name__ == "__main__":
 	centers = open_centers_csv(instance_path)
 	distance_matrix = open_distances_matrix(instance_path)
 
-	size, crossover_rate, mutation_rate, max_execution_time, k = prompt_genetic_algorithm_parameters(100, .8, .1, 10, 3)
+	size, crossover_rate, mutation_rate, max_execution_time, k = prompt_genetic_algorithm_parameters(100, .8, .1, 1, 3)
 
 	print("Running genetic algorithm...")
 
@@ -24,11 +24,16 @@ if __name__ == "__main__":
 	print("\nSolution:")
 
 	for i in range(len(solution.assignments)):
-		print("Mission", missions[i].speciality, "is assigned to employee", employees[solution.assignments[i] - 1].speciality)
+		if solution.assignments[i] != 0:
+			print(f"Mission {missions[i].id} assigned to employee {solution.assignments[i]}")
+		else:
+			print(f"Mission {missions[i].id} not assigned")
 
-	evaluation = solution.evaluate(employees, missions, distance_matrix)
+	evaluation = solution.evaluate(distance_matrix, employees, missions)
 
 	print(f"\nNumber of missions assigned: {evaluation[0]}")
 	print(f"Total distance traveled: {evaluation[1]}")
 	print(f"Number of corresponding specialities: {evaluation[2]}")
+
+	# TODO : Assign center to each mission
 	

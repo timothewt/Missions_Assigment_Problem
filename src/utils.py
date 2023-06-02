@@ -136,3 +136,8 @@ def prompt_genetic_algorithm_parameters(default_size: int, default_crossover_rat
 		k = int(input(">>> "))
 
 	return size, crossover_rate, mutation_rate, max_execution_time, k
+
+
+def get_missions_by_id(missions: list[Mission], id: int) -> Mission:
+	return next((mission for mission in missions if mission.id == id), None)
+		

@@ -49,6 +49,7 @@ class Schedule:
 		Checks if the schedule is valid, i.e. if no mission overlaps another mission
 		:return: True if the schedule is valid, False otherwise
 		"""
+		# TODO : add travel time between missions (add distance matrix to the paramters)
 		for i in range(len(self.missions) - 1):
 			if self.missions[i].day == self.missions[i + 1].day:
 				if self.missions[i].end_time > self.missions[i + 1].start_time:
