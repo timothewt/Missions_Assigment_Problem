@@ -30,7 +30,7 @@ def open_employees_csv(path_to_folder: str) -> list[Employee]:
 	with open(path_to_folder + "employees.csv", newline='') as csvfile:
 		reader = csv.reader(csvfile)
 		for row in reader:
-			employees.append(Employee(int(row[0]), row[1], row[2], row[3]))
+			employees.append(Employee(int(row[0]), int(row[1]), row[2], row[3]))
 	return employees
 
 

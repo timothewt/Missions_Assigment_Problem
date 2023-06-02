@@ -1,0 +1,1 @@
+TRAVEL_SPEED = 50 / 60  # km/min

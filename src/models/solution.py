@@ -1,9 +1,9 @@
 class Solution:
-	assigments: list[int]
+	assignments: list[int]
 	
 
 	def __init__(self, size: int):
-		assigments = [0] * size
+		self.assignments = [0] * size
 
 
 	def get_fitness_1(self) -> float:
@@ -23,7 +23,7 @@ class Solution:
 
 
 	def __str__(self):
-		return f"{self.assigments}"
+		return f"{self.assignments}"
 
 
 	def __repr__(self):
