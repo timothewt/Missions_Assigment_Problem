@@ -3,6 +3,7 @@ class Employee:
 	center_id: str
 	skill: str
 	speciality: str
+	schedule: Schedule
 
 
 	def __init__(self, id: int, center_id: str, skill: str, speciality: str):

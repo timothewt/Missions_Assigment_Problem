@@ -1,5 +1,6 @@
 class Solution:
 	assigments: list[int]
+	
 
 	def __init__(self, size: int):
 		assigments = [0] * size
