@@ -12,13 +12,13 @@ class Solution:
 
 	def get_fitness_1(self) -> float:
 		count = len(self.assignments)
-		for n in self.assignments:
-			if n == 0:
+		for assigned_employee_id in self.assignments:
+			if assigned_employee_id == 0:
 				count -= 1
 		return count
 
 
-	def get_fitness_2(self, distance_matrix: list[list[float]], mission_matrix : list[list[int]]) -> float:
+	def get_fitness_2(self, distance_matrix: list[list[float]]) -> float:
 
 
 		return 0
@@ -32,11 +32,24 @@ class Solution:
 					insertion
 		return E
 
-	def check_schedule(self, E: list[list[int]], M: ):
-		for
+	# def check_schedule(self, E: list[list[int]], M: ):
+	# 	for
 
-	def get_fitness_3(self) -> float:
-		return 0
+	def get_fitness_3(self, employees: list[Employee], missions: list[Mission]) -> float:
+		"""
+		Computes the specialities fitness, i.e. the number of corresponding speciality between missions and employees
+		:param employees: the employees
+		:param missions: the missions
+		:return: the specialities fitness
+		"""
+		count = len(self.assignments)
+		for mission_index, assigned_employee_id in enumerate(self.assignments):
+			if assigned_employee_id == 0:
+				count -= 1
+				continue
+			if employees[assigned_employee_id - 1].speciality != next((mission for mission in missions if mission.id == mission_index + 1), None).speciality:
+				count -= 1
+		return count
 
 
 	def mutate(self) -> None:

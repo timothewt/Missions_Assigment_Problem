@@ -67,10 +67,10 @@ def prompt_instance_parameters() -> list[int|int]:
 	Prompts the user to choose an instance and returns the number of missions and centers
 	:return: list of missions number and centers number
 	"""
-	missions_nb = [100, 200, 30, 66, 94, 94]
-	centers_nb = [2, 2, 2, 2, 2, 3]
+	missions_nb = [30, 66, 94, 94, 100, 200]
+	centers_nb = [2, 2, 2, 3, 2, 2]
 
-	print(f"Please enter the instance number (1-{len(missions_nb)})):")
+	print(f"Please enter the instance number (1-{len(missions_nb)}):")
 	for i in range(len(missions_nb)):
 		print(f"{i+1} - {missions_nb[i]} missions, {centers_nb[i]} centers")
 

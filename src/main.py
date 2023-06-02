@@ -13,14 +13,14 @@ if __name__ == "__main__":
 	centers = open_centers_csv(instance_path)
 	distance_matrix = open_distances_matrix(instance_path)
 
-	solution = genetic_algorithm(employees, missions, centers, distance_matrix, size=100, crossover_rate=0.8, mutation_rate=0.1, max_execution_time=.5)
+	solution = genetic_algorithm(employees, missions, centers, distance_matrix, size=100, crossover_rate=0.8, mutation_rate=0.1, max_execution_time=5, k=2)
 
 	missions.sort(key=lambda mission: mission.id)
 
 	for i in range(len(solution.assignments)):
-		print(f"Mission {i + 1} is assigned to employee {solution.assignments[i]}")
+		print("Mission", missions[i].speciality, "is assigned to employee", employees[solution.assignments[i] - 1].speciality)
 
 	print(f"\nNumber of missions assigned: {solution.get_fitness_1()}")
 	print(f"Total distance traveled: {solution.get_fitness_2(distance_matrix)}")
-	print(f"Number of corresponding specialities: {solution.get_fitness_3()}")
+	print(f"Number of corresponding specialities: {solution.get_fitness_3(employees, missions)}")
 	

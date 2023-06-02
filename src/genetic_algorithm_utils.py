@@ -76,7 +76,7 @@ def get_nearest_neighbour_solution(employees: list[Employee], missions: list[Mis
 	return solution
 
 
-def tournament_choice(population: list[Solution], distance_matrix: list[list[float]], k: int) -> Solution:
+def tournament_choice(population: list[Solution], employees: list[Employee], missions: list[Mission], distance_matrix: list[list[float]], k: int) -> Solution:
 	"""
 	Performs a tournament iteration 
 	:param population: list of solutions
@@ -88,13 +88,15 @@ def tournament_choice(population: list[Solution], distance_matrix: list[list[flo
 	for i in range(k):
 		solutions[i] = choice(population)
 
-	return pick_best_solutions(solutions, distance_matrix, 1)[0]
+	return pick_best_solutions(solutions, employees, missions, distance_matrix, 1)[0]
 
 
-def pick_best_solutions(solutions: list[Solution], distance_matrix: list[list[float]], number_of_solutions_to_keep: int) -> list[Solution]:
+def pick_best_solutions(solutions: list[Solution], employees: list[Employee], missions: list[Mission], distance_matrix: list[list[float]], number_of_solutions_to_keep: int) -> list[Solution]:
 	"""
 	Picks the best solution in a list using cascade sorting
 	:param solutions: solutions from which we pick the best
+	:param employees: list of employees
+	:param missions: list of missions
 	:param distance_matrix: matrix of distances between center-center, centers-missions, missions-missions
 	:param number_of_solutions_to_keep: number of solutions to keep
 	:return: the best solution in the list
@@ -102,7 +104,7 @@ def pick_best_solutions(solutions: list[Solution], distance_matrix: list[list[fl
 	if len(solutions) <= number_of_solutions_to_keep:
 		return solutions
 	# sorts by assignment number, -1 * travel cost of employees and corresponding speciality assignments number, in descending order (the -1* is to sort in ascending order)
-	solutions.sort(key=lambda sol: (sol.get_fitness_1(), -sol.get_fitness_2(distance_matrix), sol.get_fitness_3()), reverse=True)
+	solutions.sort(key=lambda sol: (sol.get_fitness_1(), -sol.get_fitness_2(distance_matrix), sol.get_fitness_3(employees, missions)), reverse=True)
 
 	return solutions[:number_of_solutions_to_keep]
 
