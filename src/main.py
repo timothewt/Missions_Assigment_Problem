@@ -25,7 +25,7 @@ if __name__ == "__main__":
 
 	for i in range(len(solution.assignments)):
 		if solution.assignments[i] != 0:
-			print(f"Mission {missions[i].id} assigned to employee {solution.assignments[i]}")
+			print(f"Mission {missions[i].id} assigned to employee n°{solution.assignments[i]} and center n° {employees[solution.assignments[i] - 1].center_id}")
 		else:
 			print(f"Mission {missions[i].id} not assigned")
 
@@ -34,6 +34,4 @@ if __name__ == "__main__":
 	print(f"\nNumber of missions assigned: {evaluation[0]}")
 	print(f"Total distance traveled: {evaluation[1]}")
 	print(f"Number of corresponding specialities: {evaluation[2]}")
-
-	# TODO : Assign center to each mission
 	
