@@ -37,7 +37,7 @@ def get_nearest_neighbour_solution(employees: list[Employee], missions: list[Mis
 	solution = Solution(len(missions))
 	centers_nb = len(centers)
 
-	for mission_index, mission in enumerate(missions):
+	for mission_id, mission in missions.items():
 		employees_distances_from_missions = [float('inf') for _ in range(len(employees))]
 
 		for employee_index, employee in enumerate(employees):
@@ -46,11 +46,11 @@ def get_nearest_neighbour_solution(employees: list[Employee], missions: list[Mis
 				continue
 		
 			if employee.schedule.is_empty_for_day(mission.day):  # if the employee has no mission for the current day, he starts from its center
-				employees_distances_from_missions[employee_index] = distance_matrix[employee.center_id - 1][centers_nb + mission.id - 1]
+				employees_distances_from_missions[employee_index] = distance_matrix[employee.center_id - 1][centers_nb + mission_id - 1]
 			else:  # gets the distance from the last mission of the employee
 				last_mission = employee.schedule.missions[-1]
 
-				distance_from_last_mission = distance_matrix[centers_nb + last_mission.id - 1][centers_nb + mission.id - 1]
+				distance_from_last_mission = distance_matrix[centers_nb + last_mission.id - 1][centers_nb + mission_id - 1]
 				travel_time_from_last_mission = distance_from_last_mission * TRAVEL_SPEED
 
 				if (last_mission.end_time + travel_time_from_last_mission) >= mission.start_time:  # if the employee cannot make it before the end of its last mission, does not consider him
@@ -67,7 +67,7 @@ def get_nearest_neighbour_solution(employees: list[Employee], missions: list[Mis
 					nearest_employees_indices.append(employee_index)
 
 			picked_employee =  employees[choice(nearest_employees_indices)]
-			solution.assignments[mission.id - 1] = picked_employee.id  # picks a random employee from the closest one to add diversity
+			solution.assignments[mission_id - 1] = picked_employee.id  # picks a random employee from the closest one to add diversity
 			picked_employee.schedule.add_mission(mission)
 
 	for employee in employees:

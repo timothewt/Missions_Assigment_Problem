@@ -11,12 +11,11 @@ def open_missions_csv(path_to_folder: str) -> list[Mission]:
 	:param path_to_folder: path to the folder of the csv file
 	:return: list of missions
 	"""
-	missions = []
+	missions = dict()  # hash table for missions using their ids as keys
 	with open(path_to_folder + "missions.csv", newline='') as csvfile:
 		reader = csv.reader(csvfile)
 		for row in reader:
-			missions.append(Mission(int(row[0]), int(row[1]), int(row[2]), int(row[3]), row[4], row[5]))
-	missions.sort(key=operator.attrgetter('day', 'start_time'))
+			missions[int(row[0])] = Mission(int(row[0]), int(row[1]), int(row[2]), int(row[3]), row[4], row[5])
 	return missions
 
 
@@ -136,8 +135,4 @@ def prompt_genetic_algorithm_parameters(default_size: int, default_crossover_rat
 		k = int(input(">>> "))
 
 	return size, crossover_rate, mutation_rate, max_execution_time, k
-
-
-def get_missions_by_id(missions: list[Mission], id: int) -> Mission:
-	return next((mission for mission in missions if mission.id == id), None)
 		

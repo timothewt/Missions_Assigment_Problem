@@ -20,6 +20,7 @@ def genetic_algorithm(employees: list[Employee], missions: list[Mission], center
 	population = generate_initial_population(employees, missions, centers, distance_matrix, size)
 	while time() - start_time < max_execution_time:
 		population = genetic_algorithm_iteration(employees, missions, population, distance_matrix, size, crossover_rate, mutation_rate, k, len(centers))
+		print(f"sol: {pick_best_solutions(population, employees, missions, distance_matrix, 1)[0].evaluate(distance_matrix, employees, missions)}")
 
 	return pick_best_solutions(population, employees, missions, distance_matrix, 1)[0]
 

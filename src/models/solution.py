@@ -57,11 +57,11 @@ class Solution:
 		:return: the specialities fitness
 		"""
 		count = len(self.assignments)
-		for mission_index, assigned_employee_id in enumerate(self.assignments):
+		for mission_id, assigned_employee_id in enumerate(self.assignments):
 			if assigned_employee_id == 0:  # mission not assigned
 				count -= 1
 				continue
-			if employees[assigned_employee_id - 1].speciality != get_missions_by_id(missions, mission_index + 1).speciality:  # the second part of the boolean expression is to get the mission corresponding to the mission index (which is the mission id - 1)
+			if employees[assigned_employee_id - 1].speciality != missions[mission_id + 1].speciality:  # the second part of the boolean expression is to get the mission corresponding to the mission index (which is the mission id - 1)
 				count -= 1
 		return count
 
@@ -81,7 +81,7 @@ class Solution:
 		return self.get_fitness_1(), self.get_fitness_2(distance_matrix), self.get_fitness_3(employees, missions)
 
 
-	def is_valid(self, employees: list[Employee], missions: list[Mission], distance_matrix: list[list[float]], centers_nb: int) -> bool:
+	def is_valid(self, employees: list[Employee], missions: dict[Mission], distance_matrix: list[list[float]], centers_nb: int) -> bool:
 		"""
 		Checks if the solution is valid, i.e. if no mission overlaps another mission for each employee
 		:param employees: the employees
@@ -92,14 +92,23 @@ class Solution:
 		"""
 		is_valid = True
 		
-		for i, mission in enumerate(missions):
-			employees[self.assignments[i] - 1].schedule.add_mission(get_missions_by_id(missions, i + 1))
+		for i, mission in missions.items():
 
-		for i, employee in enumerate(employees):
+			if self.assignments[i] == 0:
+				continue
 
-			if not employee.schedule.is_valid(distance_matrix, centers_nb):
+			if mission.skill != employees[self.assignments[i] - 1].skill:
 				is_valid = False
 				break
+
+			employees[self.assignments[i] - 1].schedule.add_mission(mission)
+		else:
+
+			for i, employee in enumerate(employees):
+
+				if not employee.schedule.is_valid(distance_matrix, centers_nb):
+					is_valid = False
+					break
 
 		for employee in employees:
 			employee.reset_schedule()

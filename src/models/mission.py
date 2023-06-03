@@ -3,7 +3,7 @@ class Mission:
 	Represents a mission that will be assigned to an employee.
 	"""
 
-	id: int  			# id of the mission
+	id: int  			# id of the mission, unique
 	day: int  			# day at which the mission takes place
 	start_time: float  	# start time of the mission in minutes
 	end_time: float  	# end time of the mission in minutes
