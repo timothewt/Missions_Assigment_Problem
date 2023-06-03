@@ -28,9 +28,12 @@ def genetic_algorithm(employees: list[Employee], missions: dict[Mission], center
 
 	print("\nRunning genetic algorithm...")
 
+	nb_it = 0
 	while time() - start_time < max_execution_time:
 		population = genetic_algorithm_iteration(employees, missions, population, distance_matrix, size, crossover_rate, mutation_rate, k, len(centers))
 		# print(f"sol: {pick_best_solutions(population, employees, missions, distance_matrix, 1)[0].evaluate(distance_matrix, employees, missions)}")
+		nb_it += 1
+	print(f"  {nb_it} iterations")
 
 	return pick_best_solutions(population, employees, missions, distance_matrix, 1)[0]
 

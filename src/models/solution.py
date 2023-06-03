@@ -33,18 +33,7 @@ class Solution:
 
 
 		return 0
-
-	# def compute_E(self, nb_employee: int, nb_mission : int) -> list[list[int]]:
-	# 	E = [[0] * nb_mission for _ in range(nb_employee)]  # Matrice vide pour stocker les assignations des intervenants
-	# 	for employee in range(1, nb_employee+1):
-	# 		for n in self.assignments:
-	# 			if n == employee:
-	# 				check_schedule
-	# 				insertion
-	# 	return E
-
-	# def check_schedule(self, E: list[list[int]], M: ):
-	# 	for
+		
 
 	def get_fitness_3(self, employees: list[Employee], missions: dict[int, Mission]) -> float:
 		"""
