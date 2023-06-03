@@ -5,11 +5,11 @@ from models.employee import Employee
 from models.center import Center
 
 
-def open_missions_csv(path_to_folder: str) -> list[Mission]:
+def open_missions_csv(path_to_folder: str) -> dict[int, Mission]:
 	"""
-	Opens the missions csv file and returns a list of missions
+	Opens the missions csv file and returns a dict of missions
 	:param path_to_folder: path to the folder of the csv file
-	:return: list of missions
+	:return: dict of missions
 	"""
 	missions = dict()  # hash table for missions using their ids as keys
 	with open(path_to_folder + "missions.csv", newline='') as csvfile:

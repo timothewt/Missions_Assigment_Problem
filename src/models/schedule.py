@@ -22,6 +22,38 @@ class Schedule:
 		self.missions = []
 
 
+	def can_fit_in_schedule(self, mission: Mission, distance_matrix: list[list[bool]], centers_nb: int) -> bool:
+		"""
+		Checks if the mission can fit in the schedule
+		:param mission: the mission to check
+		:param distance_matrix: the distance matrix
+		:param centers_nb: the number of centers used in the distance matrix indices
+		:return: True if the mission can fit in the schedule, False otherwise
+		"""
+		for i in range(len(self.missions) - 1, -1, -1):
+
+			if self.missions[i].day < mission.day:
+				break
+
+			if self.missions[i].day == mission.day:
+				# considering the travel time between missions
+
+				if self.missions[i].start_time < mission.start_time:
+					# if the mission i starts before the mission we are checking
+					distance_from_mission = distance_matrix[centers_nb + self.missions[i].id - 1][centers_nb + mission.id - 1]
+
+					if self.missions[i].end_time + distance_from_mission / TRAVEL_SPEED > mission.start_time:
+						return False
+				else:
+					# if the mission i ends before the mission we are checking
+					distance_from_mission = distance_matrix[centers_nb + mission.id - 1][centers_nb + self.missions[i].id - 1]
+					
+					if mission.end_time + distance_from_mission / TRAVEL_SPEED > self.missions[i].start_time:
+						return False
+
+		return True
+
+
 	def add_mission(self, mission: Mission) -> None:
 		"""
 		Adds a mission to the schedule

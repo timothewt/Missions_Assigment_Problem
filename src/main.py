@@ -13,19 +13,17 @@ if __name__ == "__main__":
 	centers = open_centers_csv(instance_path)
 	distance_matrix = open_distances_matrix(instance_path)
 
-	size, crossover_rate, mutation_rate, max_execution_time, k = prompt_genetic_algorithm_parameters(100, .8, .1, 10, 3)
+	size, crossover_rate, mutation_rate, max_execution_time, k = prompt_genetic_algorithm_parameters(100, .8, .1, 1, 3)
 
 	print("Running genetic algorithm...")
 
 	solution = genetic_algorithm(employees, missions, centers, distance_matrix, size=size, crossover_rate=crossover_rate, mutation_rate=mutation_rate, max_execution_time=max_execution_time, k=k)
 
-	# missions.sort(key=lambda mission: mission.id)
-
 	print("\nSolution:")
 
-	for i in range(len(solution.assignments)):
-		if solution.assignments[i] != 0:
-			print(f"Mission {missions[i].id} assigned to employee n°{solution.assignments[i]} and center n° {employees[solution.assignments[i] - 1].center_id}")
+	for i in range(1, len(missions) + 1):
+		if i in solution.assignments:
+			print(f"Mission {missions[i].id} assigned to employee no.{solution.assignments[i]} and center no.{employees[solution.assignments[i] - 1].center_id}")
 		else:
 			print(f"Mission {missions[i].id} not assigned")
 

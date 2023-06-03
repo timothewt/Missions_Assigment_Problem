@@ -8,11 +8,11 @@ class Solution:
 	Represents a solution to the assigment problem, and an individual for the genetic algorithm
 	"""
 	
-	assignments: list[int]  # list of the assignments of the missions to the employees, assigments[i] is the id of the employee assigned to mission i
+	assignments: dict[int, int]  # hash table to store employees assigned to mission, assigments[i] is the id of the employee assigned to mission of id i
 
 
-	def __init__(self, size: int) -> None:
-		self.assignments = [0] * size
+	def __init__(self) -> None:
+		self.assignments = dict()
 
 
 	def get_fitness_1(self) -> float:
@@ -20,11 +20,7 @@ class Solution:
 		Computes the fitness corresponding to the number of missions assigned
 		:return: the number of missions assigned
 		"""
-		count = len(self.assignments)
-		for assigned_employee_id in self.assignments:
-			if assigned_employee_id == 0:
-				count -= 1
-		return count
+		return len(self.assignments)
 
 
 	def get_fitness_2(self, distance_matrix: list[list[float]]) -> float:
@@ -37,19 +33,19 @@ class Solution:
 
 		return 0
 
-	def compute_E(self, nb_employee: int, nb_mission : int) -> list[list[int]]:
-		E = [[0] * nb_mission for _ in range(nb_employee)]  # Matrice vide pour stocker les assignations des intervenants
-		for employee in range(1, nb_employee+1):
-			for n in self.assignments:
-				if n == employee:
-					check_schedule
-					insertion
-		return E
+	# def compute_E(self, nb_employee: int, nb_mission : int) -> list[list[int]]:
+	# 	E = [[0] * nb_mission for _ in range(nb_employee)]  # Matrice vide pour stocker les assignations des intervenants
+	# 	for employee in range(1, nb_employee+1):
+	# 		for n in self.assignments:
+	# 			if n == employee:
+	# 				check_schedule
+	# 				insertion
+	# 	return E
 
 	# def check_schedule(self, E: list[list[int]], M: ):
 	# 	for
 
-	def get_fitness_3(self, employees: list[Employee], missions: list[Mission]) -> float:
+	def get_fitness_3(self, employees: list[Employee], missions: dict[int, Mission]) -> float:
 		"""
 		Computes the specialities fitness, i.e. the number of corresponding speciality between missions and employees
 		:param employees: the employees
@@ -57,20 +53,20 @@ class Solution:
 		:return: the specialities fitness
 		"""
 		count = len(self.assignments)
-		for mission_id, assigned_employee_id in enumerate(self.assignments):
-			if assigned_employee_id == 0:  # mission not assigned
-				count -= 1
-				continue
-			if employees[assigned_employee_id - 1].speciality != missions[mission_id + 1].speciality:  # the second part of the boolean expression is to get the mission corresponding to the mission index (which is the mission id - 1)
+		for mission_id, assigned_employee_id in self.assignments.items():
+			if employees[assigned_employee_id - 1].speciality != missions[mission_id].speciality:
 				count -= 1
 		return count
 
 
 	def mutate(self) -> None:
+		"""
+		Mutates the solution to add diversity
+		"""
 		pass
 
 
-	def evaluate(self, distance_matrix: list[list[float]], employees: list[Employee], missions: list[Mission]) -> list[float|float|float]:
+	def evaluate(self, distance_matrix: list[list[float]], employees: list[Employee], missions: dict[int, Mission]) -> list[float|float|float]:
 		"""
 		Evaluates the solution, i.e. computes the fitnesses
 		:param distance_matrix: the distance matrix
@@ -81,7 +77,7 @@ class Solution:
 		return self.get_fitness_1(), self.get_fitness_2(distance_matrix), self.get_fitness_3(employees, missions)
 
 
-	def is_valid(self, employees: list[Employee], missions: dict[Mission], distance_matrix: list[list[float]], centers_nb: int) -> bool:
+	def is_valid(self, employees: list[Employee], missions: dict[int, Mission], distance_matrix: list[list[float]], centers_nb: int) -> bool:
 		"""
 		Checks if the solution is valid, i.e. if no mission overlaps another mission for each employee
 		:param employees: the employees
@@ -92,28 +88,31 @@ class Solution:
 		"""
 		is_valid = True
 		
-		for i, mission in missions.items():
+		for mission_id, mission in missions.items():
 
-			if self.assignments[i] == 0:
+			if mission_id not in self.assignments:
 				continue
 
-			if mission.skill != employees[self.assignments[i] - 1].skill:
+			if mission.skill != employees[self.assignments[mission_id] - 1].skill:
 				is_valid = False
 				break
 
-			employees[self.assignments[i] - 1].schedule.add_mission(mission)
-		else:
-
-			for i, employee in enumerate(employees):
-
-				if not employee.schedule.is_valid(distance_matrix, centers_nb):
-					is_valid = False
-					break
+			if employees[self.assignments[mission_id] - 1].schedule.can_fit_in_schedule(mission, distance_matrix, centers_nb):
+				employees[self.assignments[mission_id] - 1].schedule.add_mission(mission)
+			else:
+				is_valid = False
+				break
 
 		for employee in employees:
 			employee.reset_schedule()
 			
 		return is_valid
+
+
+	def copy(self):
+		copy = Solution()
+		copy.assignments = self.assignments.copy()
+		return copy
 
 
 	def __str__(self) -> str:

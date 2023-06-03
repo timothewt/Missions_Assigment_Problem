@@ -1,4 +1,3 @@
-import operator
 from copy import deepcopy
 from random import choice, random
 from config import *
@@ -8,11 +7,11 @@ from models.mission import Mission
 from models.center import Center
 
 
-def generate_initial_population(employees: list[Employee], missions: list[Mission], centers: list[Center], distance_matrix: list[list[float]], size: int) -> list[Solution]:
+def generate_initial_population(employees: list[Employee], missions: dict[int, Mission], centers: list[Center], distance_matrix: list[list[float]], size: int) -> list[Solution]:
 	"""
 	Generates an initial population of solutions
 	:param employees: list of employees
-	:param missions: list of missions
+	:param missions: dict of missions
 	:param centers: list of centers
 	:param distance_matrix: matrix of distances between center-center, centers-missions, missions-missions
 	:param size: size of the population
@@ -26,18 +25,18 @@ def generate_initial_population(employees: list[Employee], missions: list[Missio
 	return solutions
 
 
-def get_nearest_neighbour_solution(employees: list[Employee], missions: list[Mission], centers: list[Center], distance_matrix: list[list[float]]) -> Solution:
+def get_nearest_neighbour_solution(employees: list[Employee], missions: dict[int, Mission], centers: list[Center], distance_matrix: list[list[float]]) -> Solution:
 	"""
 	Generates a valid solution using the nearest neighbour algorithm
 	:param employees: list of employees
-	:param missions: list of missions
+	:param missions: dict of missions
 	:param distance_matrix: matrix of distances between center-center, centers-missions, missions-missions
 	:return: A valid solution
 	"""
-	solution = Solution(len(missions))
+	solution = Solution()
 	centers_nb = len(centers)
 
-	for mission_id, mission in missions.items():
+	for mission_id, mission in sorted(missions.items(), key=lambda m: (m[1].day, m[1].start_time)):
 		employees_distances_from_missions = [float('inf') for _ in range(len(employees))]
 
 		for employee_index, employee in enumerate(employees):
@@ -67,7 +66,8 @@ def get_nearest_neighbour_solution(employees: list[Employee], missions: list[Mis
 					nearest_employees_indices.append(employee_index)
 
 			picked_employee =  employees[choice(nearest_employees_indices)]
-			solution.assignments[mission_id - 1] = picked_employee.id  # picks a random employee from the closest one to add diversity
+
+			solution.assignments[mission_id] = picked_employee.id  # picks a random employee from the closest one to add diversity
 			picked_employee.schedule.add_mission(mission)
 
 	for employee in employees:
@@ -76,7 +76,7 @@ def get_nearest_neighbour_solution(employees: list[Employee], missions: list[Mis
 	return solution
 
 
-def tournament_choice(population: list[Solution], employees: list[Employee], missions: list[Mission], distance_matrix: list[list[float]], k: int) -> Solution:
+def tournament_choice(population: list[Solution], employees: list[Employee], missions: dict[int, Mission], distance_matrix: list[list[float]], k: int) -> Solution:
 	"""
 	Performs a tournament iteration 
 	:param population: list of solutions
@@ -91,12 +91,12 @@ def tournament_choice(population: list[Solution], employees: list[Employee], mis
 	return pick_best_solutions(solutions, employees, missions, distance_matrix, 1)[0]
 
 
-def pick_best_solutions(solutions: list[Solution], employees: list[Employee], missions: list[Mission], distance_matrix: list[list[float]], number_of_solutions_to_keep: int) -> list[Solution]:
+def pick_best_solutions(solutions: list[Solution], employees: list[Employee], missions: dict[int, Mission], distance_matrix: list[list[float]], number_of_solutions_to_keep: int) -> list[Solution]:
 	"""
 	Picks the best solution in a list using cascade sorting
 	:param solutions: solutions from which we pick the best
 	:param employees: list of employees
-	:param missions: list of missions
+	:param missions: dict of missions
 	:param distance_matrix: matrix of distances between center-center, centers-missions, missions-missions
 	:param number_of_solutions_to_keep: number of solutions to keep
 	:return: the best solution in the list
@@ -116,13 +116,12 @@ def crossover(solution1: Solution, solution2: Solution) -> list[Solution|Solutio
 	:param solution2: second solution
 	:return: two children solutions
 	"""
-	size = len(solution1.assignments)
-	mask = [round(random()) for _ in range(size)]
-	child1 = Solution(size)
-	child2 = Solution(size)
+	child1 = Solution()
+	child2 = Solution()
 
-	for i in range(size):
-		child1.assignments[i] = mask[i] * solution1.assignments[i] + (1 - mask[i]) * solution2.assignments[i]
-		child2.assignments[i] = mask[i] * solution2.assignments[i] + (1 - mask[i]) * solution1.assignments[i]
+	for mission_id, assigned_employee_id in solution1.assignments.items():
+		gene_mask = round(random())
+		child1.assignments[mission_id] = gene_mask * solution1.assignments[mission_id] + (1 - gene_mask) * solution2.assignments[mission_id]
+		child2.assignments[mission_id] = gene_mask * solution2.assignments[mission_id] + (1 - gene_mask) * solution1.assignments[mission_id]
 
 	return child1, child2
