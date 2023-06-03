@@ -18,9 +18,20 @@ def genetic_algorithm(employees: list[Employee], missions: dict[Mission], center
 	"""
 	start_time = time()
 	population = generate_initial_population(employees, missions, centers, distance_matrix, size)
+
+	best_initial_evaluation = pick_best_solutions(population, employees, missions, distance_matrix, 1)[0].evaluate(distance_matrix, employees, missions)
+
+	print("  Best initial solution:")
+
+	print(f"Number of missions assigned: {best_initial_evaluation[0]}")
+	print(f"Total distance traveled: {best_initial_evaluation[1]}")
+	print(f"Number of corresponding specialities: {best_initial_evaluation[2]}")
+
+	print("\nRunning genetic algorithm...")
+
 	while time() - start_time < max_execution_time:
 		population = genetic_algorithm_iteration(employees, missions, population, distance_matrix, size, crossover_rate, mutation_rate, k, len(centers))
-		print(f"sol: {pick_best_solutions(population, employees, missions, distance_matrix, 1)[0].evaluate(distance_matrix, employees, missions)}")
+		# print(f"sol: {pick_best_solutions(population, employees, missions, distance_matrix, 1)[0].evaluate(distance_matrix, employees, missions)}")
 
 	return pick_best_solutions(population, employees, missions, distance_matrix, 1)[0]
 
@@ -43,7 +54,7 @@ def genetic_algorithm_iteration(employees: list[Employee], missions: dict[Missio
 	for _ in range(round(crossover_rate * size)):
 		parent1 = tournament_choice(population, employees, missions, distance_matrix, k=k)
 		parent2 = tournament_choice(population, employees, missions, distance_matrix, k=k)
-		child1, child2 = crossover(parent1, parent2)
+		child1, child2 = crossover(parent1, parent2, len(missions))
 
 		if random() < mutation_rate:
 			child1.mutate(missions, employees)

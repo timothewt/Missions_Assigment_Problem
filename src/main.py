@@ -13,9 +13,7 @@ if __name__ == "__main__":
 	centers = open_centers_csv(instance_path)
 	distance_matrix = open_distances_matrix(instance_path)
 
-	size, crossover_rate, mutation_rate, max_execution_time, k = prompt_genetic_algorithm_parameters(100, .8, .1, 1, 3)
-
-	print("Running genetic algorithm...")
+	size, crossover_rate, mutation_rate, max_execution_time, k = prompt_genetic_algorithm_parameters(300, .8, .4, 10, 3)
 
 	solution = genetic_algorithm(employees, missions, centers, distance_matrix, size=size, crossover_rate=crossover_rate, mutation_rate=mutation_rate, max_execution_time=max_execution_time, k=k)
 

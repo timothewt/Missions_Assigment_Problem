@@ -1,5 +1,5 @@
 from copy import deepcopy
-from random import choice, random
+from random import choice, random, randint
 from config import *
 from models.solution import Solution
 from models.employee import Employee
@@ -60,10 +60,10 @@ def get_nearest_neighbour_solution(employees: list[Employee], missions: dict[int
 		if (min_distance := min(employees_distances_from_missions)) == float('inf'):  # if no employee can make it to the mission, the mission is not assigned
 			continue
 		else:
-			nearest_employees_indices = []  # finds the indices of all the closest employees from the mission
-			for employee_index, employee_distance in enumerate(employees_distances_from_missions):
-				if employee_distance == min_distance:
-					nearest_employees_indices.append(employee_index)
+			if random() < .2:  # 20% of chances to pick an employee who is not the closest
+				nearest_employees_indices = [employee_index for employee_index, employee_distance in enumerate(employees_distances_from_missions) if employee_distance > min_distance]
+			else:
+				nearest_employees_indices = [employee_index for employee_index, employee_distance in enumerate(employees_distances_from_missions) if employee_distance == min_distance]  # finds the indices of all the closest employees from the mission
 
 			picked_employee =  employees[choice(nearest_employees_indices)]
 
@@ -109,7 +109,7 @@ def pick_best_solutions(solutions: list[Solution], employees: list[Employee], mi
 	return solutions[:number_of_solutions_to_keep]
 
 
-def crossover(solution1: Solution, solution2: Solution) -> list[Solution|Solution]:
+def crossover(solution1: Solution, solution2: Solution, missions_nb: int) -> list[Solution|Solution]:
 	"""
 	Performs a crossover between two solutions using uniform crossover
 	:param solution1: first solution
@@ -119,9 +119,23 @@ def crossover(solution1: Solution, solution2: Solution) -> list[Solution|Solutio
 	child1 = Solution()
 	child2 = Solution()
 
-	for mission_id, assigned_employee_id in solution1.assignments.items():
-		gene_mask = round(random())
-		child1.assignments[mission_id] = gene_mask * solution1.assignments[mission_id] + (1 - gene_mask) * solution2.assignments[mission_id]
-		child2.assignments[mission_id] = gene_mask * solution2.assignments[mission_id] + (1 - gene_mask) * solution1.assignments[mission_id]
+	for mission_id in range(1, missions_nb + 1):
+		gene_mask = randint(0, 1)
+		assignment1 = solution1.assignments[mission_id] if mission_id in solution1.assignments else None
+		assignment2 = solution2.assignments[mission_id] if mission_id in solution2.assignments else None
+
+		if gene_mask:
+			if assignment1 is not None:
+				child1.assignments[mission_id] = assignment1
+			if assignment2 is not None:
+				child2.assignments[mission_id] = assignment2
+		else:
+			if assignment2 is not None:
+				child1.assignments[mission_id] = assignment2
+			if assignment1 is not None:
+				child2.assignments[mission_id] = assignment1
+
+
+
 
 	return child1, child2
