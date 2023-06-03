@@ -3,6 +3,7 @@ import operator
 from models.mission import Mission
 from models.employee import Employee
 from models.center import Center
+from models.solution import Solution
 
 
 def open_missions_csv(path_to_folder: str) -> dict[int, Mission]:
@@ -136,3 +137,26 @@ def prompt_genetic_algorithm_parameters(default_size: int, default_crossover_rat
 
 	return size, crossover_rate, mutation_rate, max_execution_time, k
 		
+
+def print_solution_assignments(solution: Solution, missions: dict[Mission], employees: list[Employee]) -> None:
+	"""
+	Prints the solution in a readable way
+	:param solution: solution to print
+	:param missions: missions hash table
+	:param employees: employees list
+	"""
+	for i in range(1, len(missions) + 1):
+		if i in solution.assignments:
+			print(f"Mission {missions[i].id} assigned to employee no.{solution.assignments[i]} and center no.{employees[solution.assignments[i] - 1].center_id}")
+		else:
+			print(f"Mission {missions[i].id} not assigned")
+
+
+def print_solution_evaluation(evaluation: list[float|float|float]) -> None:
+	"""
+	Prints the solution evaluation in a readable way
+	:param solution: solution to print
+	"""
+	print(f"Number of missions assigned: {evaluation[0]}")
+	print(f"Total distance traveled: {evaluation[1]}")
+	print(f"Number of corresponding specialities: {evaluation[2]}")

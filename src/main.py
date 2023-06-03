@@ -19,15 +19,9 @@ if __name__ == "__main__":
 
 	print("\nSolution:")
 
-	for i in range(1, len(missions) + 1):
-		if i in solution.assignments:
-			print(f"Mission {missions[i].id} assigned to employee no.{solution.assignments[i]} and center no.{employees[solution.assignments[i] - 1].center_id}")
-		else:
-			print(f"Mission {missions[i].id} not assigned")
+	print_solution_assignments(solution, missions, employees)
 
-	evaluation = solution.evaluate(distance_matrix, employees, missions)
+	print("")
 
-	print(f"\nNumber of missions assigned: {evaluation[0]}")
-	print(f"Total distance traveled: {evaluation[1]}")
-	print(f"Number of corresponding specialities: {evaluation[2]}")
+	print_solution_evaluation(best_initial_evaluation)
 	

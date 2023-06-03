@@ -1,5 +1,6 @@
 from time import time
 from models.solution import Solution
+from utils import print_solution_evaluation
 from genetic_algorithm_utils import *
 
 
@@ -23,9 +24,7 @@ def genetic_algorithm(employees: list[Employee], missions: dict[Mission], center
 
 	print("  Best initial solution:")
 
-	print(f"Number of missions assigned: {best_initial_evaluation[0]}")
-	print(f"Total distance traveled: {best_initial_evaluation[1]}")
-	print(f"Number of corresponding specialities: {best_initial_evaluation[2]}")
+	print_solution_evaluation(best_initial_evaluation)
 
 	print("\nRunning genetic algorithm...")
 
