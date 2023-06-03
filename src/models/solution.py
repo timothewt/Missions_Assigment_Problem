@@ -1,3 +1,4 @@
+from random import randint, random
 from models.employee import Employee
 from models.mission import Mission
 from utils import *
@@ -59,11 +60,28 @@ class Solution:
 		return count
 
 
-	def mutate(self) -> None:
+	def mutate(self, missions: dict[Mission], employees: list[Employee]) -> None:
 		"""
 		Mutates the solution to add diversity
+		Selects two genes randomly and swaps them
+		If one of the genes is not assigned, it is assigned to a random employee
 		"""
-		pass
+		gene1 = randint(1, len(missions))
+		skill = missions[gene1].skill
+
+		if gene1 not in self.assignments:
+			self.assignments[gene1] = randint(1, len(employees))
+
+			while employees[self.assignments[gene1] - 1].skill != skill:
+				self.assignments[gene1] = randint(1, len(employees))
+
+		else:
+			gene2 = randint(1, len(missions))
+
+			while missions[gene2].skill != skill or gene2 not in self.assignments or self.assignments[gene1] == self.assignments[gene2]:
+				gene2 = randint(1, len(missions))
+
+			self.assignments[gene1], self.assignments[gene2] = self.assignments[gene2], self.assignments[gene1]
 
 
 	def evaluate(self, distance_matrix: list[list[float]], employees: list[Employee], missions: dict[int, Mission]) -> list[float|float|float]:

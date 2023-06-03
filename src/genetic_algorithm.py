@@ -46,9 +46,9 @@ def genetic_algorithm_iteration(employees: list[Employee], missions: dict[Missio
 		child1, child2 = crossover(parent1, parent2)
 
 		if random() < mutation_rate:
-			child1.mutate()
+			child1.mutate(missions, employees)
 		if random() < mutation_rate:
-			child2.mutate()
+			child2.mutate(missions, employees)
 
 		if child1.is_valid(employees, missions, distance_matrix, centers_nb):
 			population.append(child1)
