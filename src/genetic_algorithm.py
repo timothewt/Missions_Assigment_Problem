@@ -4,10 +4,10 @@ from utils import print_solution_evaluation
 from genetic_algorithm_utils import *
 
 
-def genetic_algorithm(employees: list[Employee], missions: dict[Mission], centers: list[Center], distance_matrix: list[list[float]], size: int, crossover_rate: float, mutation_rate: float, max_execution_time: int, k: int) -> Solution:
+def genetic_algorithm(employees: dict[int, Employee], missions: dict[Mission], centers: list[Center], distance_matrix: list[list[float]], size: int, crossover_rate: float, mutation_rate: float, max_execution_time: int, k: int) -> Solution:
 	"""
 	Performs the genetic algorithm
-	:param employees: list of employees to assign to missions
+	:param employees: dict of employees to assign to missions
 	:param missions: dict of missions to assign to employees
 	:param distance_matrix: matrix of distances between center-center, centers-missions, missions-missions
 	:param size: size of the population
@@ -38,10 +38,10 @@ def genetic_algorithm(employees: list[Employee], missions: dict[Mission], center
 	return pick_best_solutions(population, employees, missions, distance_matrix, 1)[0]
 
 
-def genetic_algorithm_iteration(employees: list[Employee], missions: dict[Mission], population: list[Solution], distance_matrix: list[list[float]], size: int, crossover_rate: float, mutation_rate: float, k: int, centers_nb: int) -> list[Solution]:
+def genetic_algorithm_iteration(employees: dict[int, Employee], missions: dict[Mission], population: list[Solution], distance_matrix: list[list[float]], size: int, crossover_rate: float, mutation_rate: float, k: int, centers_nb: int) -> list[Solution]:
 	"""
 	Performs a single iteration of the genetic algorithm
-	:param employees: list of employees to assign to missions
+	:param employees: dict of employees to assign to missions
 	:param missions: dict of missions to assign to employees
 	:param population: list of solutions
 	:param distance_matrix: matrix of distances between center-center, centers-missions, missions-missions

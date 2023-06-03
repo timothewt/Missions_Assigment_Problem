@@ -30,12 +30,11 @@ class Solution:
 		:param distance_matrix: the distance matrix
 		:return: the distance fitness
 		"""
-
-
-		return 0
 		
+		return 0
 
-	def get_fitness_3(self, employees: list[Employee], missions: dict[int, Mission]) -> float:
+
+	def get_fitness_3(self, employees: dict[int, Employee], missions: dict[int, Mission]) -> float:
 		"""
 		Computes the specialities fitness, i.e. the number of corresponding speciality between missions and employees
 		:param employees: the employees
@@ -44,12 +43,12 @@ class Solution:
 		"""
 		count = len(self.assignments)
 		for mission_id, assigned_employee_id in self.assignments.items():
-			if employees[assigned_employee_id - 1].speciality != missions[mission_id].speciality:
+			if employees[assigned_employee_id].speciality != missions[mission_id].speciality:
 				count -= 1
 		return count
 
 
-	def mutate(self, missions: dict[Mission], employees: list[Employee]) -> None:
+	def mutate(self, missions: dict[Mission], employees: dict[int, Employee]) -> None:
 		"""
 		Mutates the solution to add diversity
 		Selects two genes randomly and swaps them
@@ -61,7 +60,7 @@ class Solution:
 		if gene1 not in self.assignments:
 			self.assignments[gene1] = randint(1, len(employees))
 
-			while employees[self.assignments[gene1] - 1].skill != skill:
+			while employees[self.assignments[gene1]].skill != skill:
 				self.assignments[gene1] = randint(1, len(employees))
 
 		else:
@@ -73,7 +72,7 @@ class Solution:
 			self.assignments[gene1], self.assignments[gene2] = self.assignments[gene2], self.assignments[gene1]
 
 
-	def evaluate(self, distance_matrix: list[list[float]], employees: list[Employee], missions: dict[int, Mission]) -> list[float|float|float]:
+	def evaluate(self, distance_matrix: list[list[float]], employees: dict[int, Employee], missions: dict[int, Mission]) -> list[float|float|float]:
 		"""
 		Evaluates the solution, i.e. computes the fitnesses
 		:param distance_matrix: the distance matrix
@@ -84,7 +83,7 @@ class Solution:
 		return self.get_fitness_1(), self.get_fitness_2(distance_matrix), self.get_fitness_3(employees, missions)
 
 
-	def is_valid(self, employees: list[Employee], missions: dict[int, Mission], distance_matrix: list[list[float]], centers_nb: int) -> bool:
+	def is_valid(self, employees: dict[int, Employee], missions: dict[int, Mission], distance_matrix: list[list[float]], centers_nb: int) -> bool:
 		"""
 		Checks if the solution is valid, i.e. if no mission overlaps another mission for each employee
 		:param employees: the employees
@@ -100,17 +99,17 @@ class Solution:
 			if mission_id not in self.assignments:
 				continue
 
-			if mission.skill != employees[self.assignments[mission_id] - 1].skill:
+			if mission.skill != employees[self.assignments[mission_id]].skill:
 				is_valid = False
 				break
 
-			if employees[self.assignments[mission_id] - 1].schedule.can_fit_in_schedule(mission, distance_matrix, centers_nb):
-				employees[self.assignments[mission_id] - 1].schedule.add_mission(mission)
+			if employees[self.assignments[mission_id]].schedule.can_fit_in_schedule(mission, distance_matrix, centers_nb):
+				employees[self.assignments[mission_id]].schedule.add_mission(mission)
 			else:
 				is_valid = False
 				break
 
-		for employee in employees:
+		for _, employee in employees.items():
 			employee.reset_schedule()
 			
 		return is_valid

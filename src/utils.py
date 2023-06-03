@@ -20,17 +20,17 @@ def open_missions_csv(path_to_folder: str) -> dict[int, Mission]:
 	return missions
 
 
-def open_employees_csv(path_to_folder: str) -> list[Employee]:
+def open_employees_csv(path_to_folder: str) -> dict[int, Employee]:
 	"""
-	Opens the employees csv file and returns a list of employees
+	Opens the employees csv file and returns a dict of employees
 	:param path_to_folder: path to the csv file
-	:return: list of employees
+	:return: dict of employees
 	"""
-	employees = []
+	employees = dict()
 	with open(path_to_folder + "employees.csv", newline='') as csvfile:
 		reader = csv.reader(csvfile)
 		for row in reader:
-			employees.append(Employee(int(row[0]), int(row[1]), row[2], row[3]))
+			employees[int(row[0])] = Employee(int(row[0]), int(row[1]), row[2], row[3])
 	return employees
 
 
@@ -138,16 +138,16 @@ def prompt_genetic_algorithm_parameters(default_size: int, default_crossover_rat
 	return size, crossover_rate, mutation_rate, max_execution_time, k
 		
 
-def print_solution_assignments(solution: Solution, missions: dict[Mission], employees: list[Employee]) -> None:
+def print_solution_assignments(solution: Solution, missions: dict[Mission], employees: dict[int, Employee]) -> None:
 	"""
 	Prints the solution in a readable way
 	:param solution: solution to print
 	:param missions: missions hash table
-	:param employees: employees list
+	:param employees: employees dict
 	"""
 	for i in range(1, len(missions) + 1):
 		if i in solution.assignments:
-			print(f"Mission {missions[i].id} assigned to employee no.{solution.assignments[i]} and center no.{employees[solution.assignments[i] - 1].center_id}")
+			print(f"Mission {missions[i].id} assigned to employee no.{solution.assignments[i]} and center no.{employees[solution.assignments[i]].center_id}")
 		else:
 			print(f"Mission {missions[i].id} not assigned")
 

@@ -7,7 +7,7 @@ from models.mission import Mission
 from models.center import Center
 
 
-def generate_initial_population(employees: list[Employee], missions: dict[int, Mission], centers: list[Center], distance_matrix: list[list[float]], size: int) -> list[Solution]:
+def generate_initial_population(employees: dict[int, Employee], missions: dict[int, Mission], centers: list[Center], distance_matrix: list[list[float]], size: int) -> list[Solution]:
 	"""
 	Generates an initial population of solutions
 	:param employees: list of employees
@@ -25,7 +25,7 @@ def generate_initial_population(employees: list[Employee], missions: dict[int, M
 	return solutions
 
 
-def get_nearest_neighbour_solution(employees: list[Employee], missions: dict[int, Mission], centers: list[Center], distance_matrix: list[list[float]]) -> Solution:
+def get_nearest_neighbour_solution(employees: dict[int, Employee], missions: dict[int, Mission], centers: list[Center], distance_matrix: list[list[float]]) -> Solution:
 	"""
 	Generates a valid solution using the nearest neighbour algorithm
 	:param employees: list of employees
@@ -37,46 +37,55 @@ def get_nearest_neighbour_solution(employees: list[Employee], missions: dict[int
 	centers_nb = len(centers)
 
 	for mission_id, mission in sorted(missions.items(), key=lambda m: (m[1].day, m[1].start_time)):
-		employees_distances_from_missions = [float('inf') for _ in range(len(employees))]
+		employees_distances_from_mission: dict[int, float] = {}
 
-		for employee_index, employee in enumerate(employees):
+		for employee_id, employee in employees.items():
 
 			if employee.skill != mission.skill:  # if the skill does not match, does not consider this employee
 				continue
 		
-			if employee.schedule.is_empty_for_day(mission.day):  # if the employee has no mission for the current day, he starts from its center
-				employees_distances_from_missions[employee_index] = distance_matrix[employee.center_id - 1][centers_nb + mission_id - 1]
-			else:  # gets the distance from the last mission of the employee
+			if employee.schedule.is_empty_for_day(mission.day):
+				# if the employee has no mission for the current day, he starts from its center
+				employees_distances_from_mission[employee_id] = distance_matrix[employee.center_id - 1][centers_nb + mission_id - 1]
+			else:
+				# gets the distance from the last mission of the employee
 				last_mission = employee.schedule.missions[-1]
 
 				distance_from_last_mission = distance_matrix[centers_nb + last_mission.id - 1][centers_nb + mission_id - 1]
 				travel_time_from_last_mission = distance_from_last_mission * TRAVEL_SPEED
 
-				if (last_mission.end_time + travel_time_from_last_mission) >= mission.start_time:  # if the employee cannot make it before the end of its last mission, does not consider him
+				if (last_mission.end_time + travel_time_from_last_mission) >= mission.start_time:
+					# if the employee cannot make it before the end of its last mission, does not consider him
 					continue
 
-				employees_distances_from_missions[employee_index] = distance_from_last_mission
+				employees_distances_from_mission[employee_id] = distance_from_last_mission
 
-		if (min_distance := min(employees_distances_from_missions)) == float('inf'):  # if no employee can make it to the mission, the mission is not assigned
+		if len(employees_distances_from_mission) == 0:  # if no employee can make it to the mission, the mission is not assigned
 			continue
 		else:
-			if random() < .2:  # 20% of chances to pick an employee who is not the closest
-				nearest_employees_indices = [employee_index for employee_index, employee_distance in enumerate(employees_distances_from_missions) if employee_distance > min_distance]
+			min_distance = min(employees_distances_from_mission.values())
+			if random() < .3:
+				# 30% of chances to pick an employee among all available ones, who may not be the closest, to add diversity to the initial solutions
+				nearest_employees_ids = [employee_id for employee_id in employees_distances_from_mission.keys()]
 			else:
-				nearest_employees_indices = [employee_index for employee_index, employee_distance in enumerate(employees_distances_from_missions) if employee_distance == min_distance]  # finds the indices of all the closest employees from the mission
+				nearest_employees_ids = [employee_id for employee_id, employee_distance in employees_distances_from_mission.items() if employee_distance == min_distance]  # finds the indices of all the closest employees from the mission
 
-			picked_employee =  employees[choice(nearest_employees_indices)]
+			try:
+				picked_employee = employees[choice(nearest_employees_ids)]
+			except:
+				print(employees_distances_from_mission, min_distance)
+				exit()
 
 			solution.assignments[mission_id] = picked_employee.id  # picks a random employee from the closest one to add diversity
 			picked_employee.schedule.add_mission(mission)
 
-	for employee in employees:
+	for _, employee in employees.items():
 		employee.reset_schedule()
 
 	return solution
 
 
-def tournament_choice(population: list[Solution], employees: list[Employee], missions: dict[int, Mission], distance_matrix: list[list[float]], k: int) -> Solution:
+def tournament_choice(population: list[Solution], employees: dict[int, Employee], missions: dict[int, Mission], distance_matrix: list[list[float]], k: int) -> Solution:
 	"""
 	Performs a tournament iteration 
 	:param population: list of solutions
@@ -91,11 +100,11 @@ def tournament_choice(population: list[Solution], employees: list[Employee], mis
 	return pick_best_solutions(solutions, employees, missions, distance_matrix, 1)[0]
 
 
-def pick_best_solutions(solutions: list[Solution], employees: list[Employee], missions: dict[int, Mission], distance_matrix: list[list[float]], number_of_solutions_to_keep: int) -> list[Solution]:
+def pick_best_solutions(solutions: list[Solution], employees: dict[int, Employee], missions: dict[int, Mission], distance_matrix: list[list[float]], number_of_solutions_to_keep: int) -> list[Solution]:
 	"""
 	Picks the best solution in a list using cascade sorting
 	:param solutions: solutions from which we pick the best
-	:param employees: list of employees
+	:param employees: dict of employees
 	:param missions: dict of missions
 	:param distance_matrix: matrix of distances between center-center, centers-missions, missions-missions
 	:param number_of_solutions_to_keep: number of solutions to keep
