@@ -23,5 +23,5 @@ if __name__ == "__main__":
 
 	print("")
 
-	print_solution_evaluation(best_initial_evaluation)
+	print_solution_evaluation(solution.evaluate(distance_matrix, employees, missions))
 	
