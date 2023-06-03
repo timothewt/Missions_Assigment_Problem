@@ -1,4 +1,5 @@
 from models.mission import Mission
+from config import *
 
 
 class Schedule:
@@ -37,23 +38,32 @@ class Schedule:
 		:return: True if the employee has no mission for the given day, False otherwise
 		"""
 		for i in range(len(self.missions) - 1, -1, -1):
+
 			if self.missions[i].day < day:
 				return True
+
 			if self.missions[i].day == day:
 				return False
+
 		return True
 
 
-	def is_valid(self) -> bool:
+	def is_valid(self, distance_matrix: list[list[float]], centers_nb: int) -> bool:
 		"""
 		Checks if the schedule is valid, i.e. if no mission overlaps another mission
+		:param distance_matrix: the distance matrix
+		:param centers_nb: the number of centers used in the distance matrix indices
 		:return: True if the schedule is valid, False otherwise
 		"""
-		# TODO : add travel time between missions (add distance matrix to the paramters)
-		for i in range(len(self.missions) - 1):
-			if self.missions[i].day == self.missions[i + 1].day:
-				if self.missions[i].end_time > self.missions[i + 1].start_time:
+		for i in range(1, len(self.missions)):
+
+			if self.missions[i - 1].day == self.missions[i].day:
+				distance_from_last_mission = distance_matrix[centers_nb + self.missions[i - 1].id - 1][centers_nb + self.missions[i].id - 1]
+				time_from_last_mission = distance_from_last_mission / TRAVEL_SPEED
+
+				if self.missions[i - 1].end_time + time_from_last_mission > self.missions[i].start_time:
 					return False
+		
 		return True
 
 

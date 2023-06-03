@@ -81,19 +81,23 @@ class Solution:
 		return self.get_fitness_1(), self.get_fitness_2(distance_matrix), self.get_fitness_3(employees, missions)
 
 
-	def is_valid(self, employees: list[Employee], missions: list[Mission]) -> bool:
+	def is_valid(self, employees: list[Employee], missions: list[Mission], distance_matrix: list[list[float]], centers_nb: int) -> bool:
 		"""
 		Checks if the solution is valid, i.e. if no mission overlaps another mission for each employee
 		:param employees: the employees
 		:param missions: the missions
+		:param distance_matrix: the distance matrix
+		:param centers_nb: the number of centers used in the distance matrix indices
 		:return: True if the solution is valid, False otherwise
 		"""
 		is_valid = True
+		
 		for i, mission in enumerate(missions):
 			employees[self.assignments[i] - 1].schedule.add_mission(get_missions_by_id(missions, i + 1))
 
 		for i, employee in enumerate(employees):
-			if not employee.schedule.is_valid():
+
+			if not employee.schedule.is_valid(distance_matrix, centers_nb):
 				is_valid = False
 				break
 
