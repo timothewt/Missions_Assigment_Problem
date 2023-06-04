@@ -35,15 +35,15 @@ class Solution:
 
 		total_dist = 0
 		for employee_id, employee in employees.items():
-			employee_center = employees[employee_id].center_id
-			prev_mission = employee_center
+			prev_mission = employee.center_id
 			dist_employee = 0
 			for mission_id, assigned_employee_id in self.assignments.items():
 				if employee_id == assigned_employee_id:
-					current_mission = employees[assigned_employee_id].schedule.missions[mission_id]
+					current_mission = employee.center_id + mission_id - 1
+					print(current_mission)
 					dist_employee += distance_matrix[prev_mission][current_mission]
 					prev_mission = current_mission
-			dist_employee += distance_matrix[prev_mission][employee_center]
+			dist_employee += distance_matrix[prev_mission][employee.center_id]
 			total_dist += int(0.2 * dist_employee)
 		return total_dist
 
@@ -95,7 +95,7 @@ class Solution:
 		:param missions: the missions
 		:return: the list of the fitnesses
 		"""
-		return self.get_fitness_1(), self.get_fitness_2(distance_matrix), self.get_fitness_3(employees, missions)
+		return self.get_fitness_1(), self.get_fitness_2(employees, missions, distance_matrix), self.get_fitness_3(employees, missions)
 
 
 	def is_valid(self, employees: dict[int, Employee], missions: dict[int, Mission], distance_matrix: list[list[float]], centers_nb: int) -> bool:
