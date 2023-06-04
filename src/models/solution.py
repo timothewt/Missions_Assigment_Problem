@@ -1,6 +1,6 @@
 from random import randint, random
-from models.employee import Employee
-from models.mission import Mission
+from src.models.employee import Employee
+from src.models.mission import Mission
 from utils import *
 
 
@@ -24,14 +24,25 @@ class Solution:
 		return len(self.assignments)
 
 
-	def get_fitness_2(self, distance_matrix: list[list[float]]) -> float:
+	def get_fitness_2(self, employees: dict[int, Employee], distance_matrix: list[list[float]]) -> float:
 		"""
 		Computes the distance fitness, i.e. the total distance traveled
 		:param distance_matrix: the distance matrix
 		:return: the distance fitness
 		"""
-		
-		return 0
+		total_dist = 0
+		for employee_id in range(len(employees.items())):
+			employee_center = employees[employee_id].center_id
+			prev_mission = employee_center
+			dist_employee = 0
+			for mission_id, assigned_employee_id in self.assignments.items():
+				if employee_id == assigned_employee_id :
+					current_mission = employees[assigned_employee_id].schedule.missions[mission_id]
+					dist_employee += distance_matrix[prev_mission][current_mission]
+					prev_mission = current_mission
+			dist_employee += distance_matrix[prev_mission][employee_center]
+			total_dist += int(0.2*dist_employee)
+		return total_dist
 
 
 	def get_fitness_3(self, employees: dict[int, Employee], missions: dict[int, Mission]) -> float:

@@ -1,4 +1,4 @@
-from models.schedule import Schedule
+from src.models.schedule import Schedule
 
 
 class Employee:

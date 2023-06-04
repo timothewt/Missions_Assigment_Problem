@@ -113,7 +113,7 @@ def pick_best_solutions(solutions: list[Solution], employees: dict[int, Employee
 	if len(solutions) <= number_of_solutions_to_keep:
 		return solutions
 	# sorts by assignment number, -1 * travel cost of employees and corresponding speciality assignments number, in descending order (the -1* is to sort in ascending order)
-	solutions.sort(key=lambda sol: (sol.get_fitness_1(), -sol.get_fitness_2(distance_matrix), sol.get_fitness_3(employees, missions)), reverse=True)
+	solutions.sort(key=lambda sol: (sol.get_fitness_1(), -sol.get_fitness_2(employees,distance_matrix), sol.get_fitness_3(employees, missions)), reverse=True)
 
 	return solutions[:number_of_solutions_to_keep]
 
@@ -143,8 +143,5 @@ def crossover(solution1: Solution, solution2: Solution, missions_nb: int) -> lis
 				child1.assignments[mission_id] = assignment2
 			if assignment1 is not None:
 				child2.assignments[mission_id] = assignment1
-
-
-
 
 	return child1, child2

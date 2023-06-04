@@ -1,5 +1,5 @@
-from models.mission import Mission
-from config import *
+from src.models.mission import Mission
+from src.config import *
 
 
 class Schedule:
