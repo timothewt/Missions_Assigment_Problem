@@ -24,14 +24,29 @@ class Solution:
 		return len(self.assignments)
 
 
-	def get_fitness_2(self, distance_matrix: list[list[float]]) -> float:
+	def get_fitness_2(self, employees: dict[int, Employee], missions: dict[int, Mission],distance_matrix: list[list[float]]) -> float:
 		"""
 		Computes the distance fitness, i.e. the total distance traveled
 		:param distance_matrix: the distance matrix
 		:return: the distance fitness
 		"""
-		
-		return 0
+		for mission_id, assigned_employee_id in self.assignments.items():
+			employees[assigned_employee_id].schedule.add_mission(missions[mission_id])
+
+		total_dist = 0
+		for employee_id, employee in employees.items():
+			employee_center = employees[employee_id].center_id
+			prev_mission = employee_center
+			dist_employee = 0
+			for mission_id, assigned_employee_id in self.assignments.items():
+				if employee_id == assigned_employee_id:
+					current_mission = employees[assigned_employee_id].schedule.missions[mission_id]
+					dist_employee += distance_matrix[prev_mission][current_mission]
+					prev_mission = current_mission
+			dist_employee += distance_matrix[prev_mission][employee_center]
+			total_dist += int(0.2 * dist_employee)
+		return total_dist
+
 
 
 	def get_fitness_3(self, employees: dict[int, Employee], missions: dict[int, Mission]) -> float:

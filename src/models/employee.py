@@ -13,7 +13,7 @@ class Employee:
 	schedule: Schedule  # schedule of the employee's missions
 
 
-	def __init__(self, id: int, center_id: str, skill: str, speciality: str, schedule: Schedule = None) -> None:
+	def __init__(self, id: int, center_id: int, skill: str, speciality: str, schedule: Schedule = None) -> None:
 		self.id = id
 		self.center_id = center_id
 		self.skill = skill
