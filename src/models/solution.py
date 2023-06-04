@@ -43,8 +43,8 @@ class Solution:
 					dist_employee += distance_matrix[prev_mission][current_mission]
 					prev_mission = current_mission
 			dist_employee += distance_matrix[prev_mission][employee.center_id]
-			total_dist += int(0.2 * dist_employee)
-		return total_dist
+			total_dist += dist_employee
+		return int(0.2 * total_dist)
 
 
 
