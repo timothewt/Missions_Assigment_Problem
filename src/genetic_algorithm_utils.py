@@ -77,7 +77,7 @@ def get_nearest_neighbour_solution(employees: dict[int, Employee], missions: dic
 				exit()
 
 			solution.assignments[mission_id] = picked_employee.id  # picks a random employee from the closest one to add diversity
-			picked_employee.schedule.add_mission(mission)
+			picked_employee.schedule.add_mission(mission, distance_matrix, centers_nb, picked_employee.center_id)
 
 	for _, employee in employees.items():
 		employee.reset_schedule()
@@ -85,7 +85,7 @@ def get_nearest_neighbour_solution(employees: dict[int, Employee], missions: dic
 	return solution
 
 
-def tournament_choice(population: list[Solution], employees: dict[int, Employee], missions: dict[int, Mission], distance_matrix: list[list[float]], k: int) -> Solution:
+def tournament_choice(population: list[Solution], employees: dict[int, Employee], missions: dict[int, Mission], distance_matrix: list[list[float]], k: int, centers_nb: int) -> Solution:
 	"""
 	Performs a tournament iteration 
 	:param population: list of solutions
@@ -97,10 +97,10 @@ def tournament_choice(population: list[Solution], employees: dict[int, Employee]
 	for i in range(k):
 		solutions[i] = choice(population)
 
-	return pick_best_solutions(solutions, employees, missions, distance_matrix, 1)[0]
+	return pick_best_solutions(solutions, employees, missions, distance_matrix, 1, centers_nb)[0]
 
 
-def pick_best_solutions(solutions: list[Solution], employees: dict[int, Employee], missions: dict[int, Mission], distance_matrix: list[list[float]], number_of_solutions_to_keep: int) -> list[Solution]:
+def pick_best_solutions(solutions: list[Solution], employees: dict[int, Employee], missions: dict[int, Mission], distance_matrix: list[list[float]], number_of_solutions_to_keep: int, centers_nb: int) -> list[Solution]:
 	"""
 	Picks the best solution in a list using cascade sorting
 	:param solutions: solutions from which we pick the best
@@ -113,7 +113,7 @@ def pick_best_solutions(solutions: list[Solution], employees: dict[int, Employee
 	if len(solutions) <= number_of_solutions_to_keep:
 		return solutions
 	# sorts by assignment number, -1 * travel cost of employees and corresponding speciality assignments number, in descending order (the -1* is to sort in ascending order)
-	solutions.sort(key=lambda sol: (sol.get_fitness_1(), -sol.get_fitness_2(employees, missions, distance_matrix), sol.get_fitness_3(employees, missions)), reverse=True)
+	solutions.sort(key=lambda sol: (sol.get_fitness_1(), -sol.get_fitness_2(employees, missions, distance_matrix, centers_nb), sol.get_fitness_3(employees, missions)), reverse=True)
 
 	return solutions[:number_of_solutions_to_keep]
 

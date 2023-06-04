@@ -22,5 +22,5 @@ if __name__ == "__main__":
 
 	print_solution_assignments(solution, missions, employees)
 
-	print_solution_evaluation(solution.evaluate(distance_matrix, employees, missions))
+	print_solution_evaluation(solution.evaluate(distance_matrix, employees, missions, len(centers)))
 	

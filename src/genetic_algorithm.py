@@ -20,7 +20,7 @@ def genetic_algorithm(employees: dict[int, Employee], missions: dict[Mission], c
 	start_time = time()
 	population = generate_initial_population(employees, missions, centers, distance_matrix, size)
 
-	best_initial_evaluation = pick_best_solutions(population, employees, missions, distance_matrix, 1)[0].evaluate(distance_matrix, employees, missions)
+	best_initial_evaluation = pick_best_solutions(population, employees, missions, distance_matrix, 1, len(centers))[0].evaluate(distance_matrix, employees, missions, len(centers))
 
 	print("  Best initial solution:")
 
@@ -35,7 +35,7 @@ def genetic_algorithm(employees: dict[int, Employee], missions: dict[Mission], c
 		nb_it += 1
 	print(f"  {nb_it} iterations")
 
-	return pick_best_solutions(population, employees, missions, distance_matrix, 1)[0]
+	return pick_best_solutions(population, employees, missions, distance_matrix, 1, len(centers))[0]
 
 
 def genetic_algorithm_iteration(employees: dict[int, Employee], missions: dict[Mission], population: list[Solution], distance_matrix: list[list[float]], size: int, crossover_rate: float, mutation_rate: float, k: int, centers_nb: int) -> list[Solution]:
@@ -54,8 +54,8 @@ def genetic_algorithm_iteration(employees: dict[int, Employee], missions: dict[M
 	"""
 
 	for _ in range(round(crossover_rate * size)):
-		parent1 = tournament_choice(population, employees, missions, distance_matrix, k=k)
-		parent2 = tournament_choice(population, employees, missions, distance_matrix, k=k)
+		parent1 = tournament_choice(population, employees, missions, distance_matrix, k, centers_nb)
+		parent2 = tournament_choice(population, employees, missions, distance_matrix, k, centers_nb)
 		child1, child2 = crossover(parent1, parent2, len(missions))
 
 		if random() < mutation_rate:
@@ -68,4 +68,4 @@ def genetic_algorithm_iteration(employees: dict[int, Employee], missions: dict[M
 		if child2.is_valid(employees, missions, distance_matrix, centers_nb):
 			population.append(child2)
 
-	return pick_best_solutions(population, employees, missions, distance_matrix, size)
+	return pick_best_solutions(population, employees, missions, distance_matrix, size, centers_nb)

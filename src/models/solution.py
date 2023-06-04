@@ -24,27 +24,20 @@ class Solution:
 		return len(self.assignments)
 
 
-	def get_fitness_2(self, employees: dict[int, Employee], missions: dict[int, Mission],distance_matrix: list[list[float]]) -> float:
+	def get_fitness_2(self, employees: dict[int, Employee], missions: dict[int, Mission], distance_matrix: list[list[float]], centers_nb: int) -> float:
 		"""
 		Computes the distance fitness, i.e. the total distance traveled
 		:param distance_matrix: the distance matrix
 		:return: the distance fitness
 		"""
 		for mission_id, assigned_employee_id in self.assignments.items():
-			employees[assigned_employee_id].schedule.add_mission(missions[mission_id])
+			employees[assigned_employee_id].schedule.add_mission(missions[mission_id], distance_matrix, centers_nb, employees[assigned_employee_id].center_id)
 
-		total_dist = 0
-		for employee_id, employee in employees.items():
-			prev_mission = employee.center_id
-			dist_employee = 0
-			for mission_id, assigned_employee_id in self.assignments.items():
-				if employee_id == assigned_employee_id:
-					current_mission = employee.center_id + mission_id - 1
-					dist_employee += distance_matrix[prev_mission][current_mission]
-					prev_mission = current_mission
-			dist_employee += distance_matrix[prev_mission][employee.center_id]
-			total_dist += dist_employee
-		return int(0.2 * total_dist)
+		total_distance = 0
+		for _, employee in employees.items():
+			total_distance += employee.schedule.distance_traveled
+
+		return total_distance
 
 
 
@@ -86,7 +79,7 @@ class Solution:
 			self.assignments[gene1], self.assignments[gene2] = self.assignments[gene2], self.assignments[gene1]
 
 
-	def evaluate(self, distance_matrix: list[list[float]], employees: dict[int, Employee], missions: dict[int, Mission]) -> list[float|float|float]:
+	def evaluate(self, distance_matrix: list[list[float]], employees: dict[int, Employee], missions: dict[int, Mission], centers_nb: int) -> list[float|float|float]:
 		"""
 		Evaluates the solution, i.e. computes the fitnesses
 		:param distance_matrix: the distance matrix
@@ -94,7 +87,7 @@ class Solution:
 		:param missions: the missions
 		:return: the list of the fitnesses
 		"""
-		return self.get_fitness_1(), self.get_fitness_2(employees, missions, distance_matrix), self.get_fitness_3(employees, missions)
+		return self.get_fitness_1(), self.get_fitness_2(employees, missions, distance_matrix, centers_nb), self.get_fitness_3(employees, missions)
 
 
 	def is_valid(self, employees: dict[int, Employee], missions: dict[int, Mission], distance_matrix: list[list[float]], centers_nb: int) -> bool:
@@ -118,7 +111,7 @@ class Solution:
 				break
 
 			if employees[self.assignments[mission_id]].schedule.can_fit_in_schedule(mission, distance_matrix, centers_nb):
-				employees[self.assignments[mission_id]].schedule.add_mission(mission)
+				employees[self.assignments[mission_id]].schedule.add_mission(mission, distance_matrix, centers_nb, employees[self.assignments[mission_id]].center_id)
 			else:
 				is_valid = False
 				break

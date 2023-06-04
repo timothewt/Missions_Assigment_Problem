@@ -10,10 +10,9 @@ class Schedule:
 	missions: list[Mission]  # list of the employee's missions, we keep the list sorted by day and start_hour
 	distance_traveled: float  # distance traveled by the employee to complete his missions
 
-	def __init__(self, missions: list[Mission] = None) -> None:
-		if missions is None:
-			missions = []
-		self.missions = missions
+	def __init__(self) -> None:
+		self.missions = []
+		self.distance_traveled = 0
 
 
 	def reset_schedule(self) -> None:
@@ -57,9 +56,13 @@ class Schedule:
 
 	def add_mission(self, mission: Mission, distance_matrix: list[list[float]], centers_nb: int, employee_center_id: int) -> None:
 		"""
-		Adds a mission to the schedule while keeping it sorted by day and start_hour
+		Adds a mission to the schedule while keeping it sorted
 		We consider that the mission had been checked with can_fit_in_schedule() before
+		When adding a mission, updates the total distance traveled by the employee
 		:param mission: the mission to add
+		:param distance_matrix: the distance matrix
+		:param centers_nb: the number of centers used in the distance matrix indices
+		:param employee_center_id: the id of the center where the employee is based
 		"""
 		if len(self.missions) == 0:
 			self.missions.append(mission)
@@ -68,35 +71,43 @@ class Schedule:
 
 		elif len(self.missions) == 1:
 			if self.missions[0].day < mission.day:
+				# if the mission to add is the day afterr the only mission in the schedule
 				self.distance_traveled += distance_matrix[employee_center_id - 1][centers_nb + mission.id - 1] + distance_matrix[centers_nb + mission.id - 1][employee_center_id - 1]
 				self.missions.append(mission)
 				return
-			elif self.mission[0].day > mission.day:
+			elif self.missions[0].day > mission.day:
+				# if the mission to add is the day before the only mission in the schedule
 				self.distance_traveled += distance_matrix[employee_center_id - 1][centers_nb + mission.id - 1] + distance_matrix[centers_nb + mission.id - 1][employee_center_id - 1]
 				self.missions.insert(0, mission)
 				return
 			elif self.missions[0].end_time <= mission.start_time:
+				# if the mission to add is the same day as the only mission in the schedule and starts after it ends
 				self.distance_traveled -= distance_matrix[centers_nb + self.missions[0].id - 1][employee_center_id - 1]
 				self.distance_traveled += distance_matrix[centers_nb + self.missions[0].id - 1][centers_nb + mission.id - 1] + distance_matrix[centers_nb + mission.id - 1][employee_center_id - 1]
 				self.missions.append(mission)
 				return
 			else:
+				# if the mission to add is the same day as the only mission in the schedule and starts before it ends
 				self.distance_traveled -= distance_matrix[employee_center_id - 1][centers_nb + self.missions[0].id - 1]
 				self.distance_traveled += distance_matrix[employee_center_id - 1][centers_nb + mission.id - 1] + distance_matrix[centers_nb + mission.id - 1][centers_nb + self.missions[0].id - 1]
 				self.missions.insert(0, mission)
 				return
 
 		if self.missions[-1].day < mission.day:
+			# if the mission to add is the day after the last mission in the schedule
 			self.distance_traveled += distance_matrix[employee_center_id - 1][centers_nb + mission.id - 1] + distance_matrix[centers_nb + mission.id - 1][employee_center_id - 1]
 			self.missions.append(mission)
 			return
 		elif (self.missions[-1].day == mission.day and self.missions[-1].end_time <= mission.start_time):
+			# if the mission to add is the same day as the last mission in the schedule and starts after it ends
 			self.distance_traveled -= distance_matrix[centers_nb + self.missions[-1].id - 1][employee_center_id - 1]
 			self.distance_traveled += distance_matrix[centers_nb + self.missions[-1].id - 1][centers_nb + mission.id - 1] + distance_matrix[centers_nb + mission.id - 1][employee_center_id - 1]
 			self.missions.append(mission)
 			return
 
 		for i in range(len(self.missions) - 2, -1, -1):
+			# we go through the schedule from the end to the beginning to insert the new mission
+
 			if (self.missions[i + 1].day > mission.day and self.missions[i].day < mission.day):
 				# no mission for mission.day
 				self.distance_traveled += distance_matrix[employee_center_id - 1][centers_nb + mission.id - 1] + distance_matrix[centers_nb + mission.id - 1][employee_center_id - 1]
@@ -119,8 +130,8 @@ class Schedule:
 
 			elif (self.missions[i + 1].day == mission.day and self.missions[i + 1].start_time >= mission.end_time and self.missions[i].day == mission.day and self.missions[i].end_time <= mission.start_time):
 				# the mission fits between two missions
-				self.distance_traveled -= distance_matrix[centers_nb + self.mission[i].id - 1][centers_nb + self.mission[i + 1].id - 1]
-				self.distance_traveled += distance_matrix[centers_nb + self.mission[i].id - 1][centers_nb + mission.id - 1] + distance_matrix[centers_nb + mission.id - 1][centers_nb + self.mission[i + 1].id - 1]
+				self.distance_traveled -= distance_matrix[centers_nb + self.missions[i].id - 1][centers_nb + self.missions[i + 1].id - 1]
+				self.distance_traveled += distance_matrix[centers_nb + self.missions[i].id - 1][centers_nb + mission.id - 1] + distance_matrix[centers_nb + mission.id - 1][centers_nb + self.missions[i + 1].id - 1]
 				self.missions.insert(i + 1, mission)
 				return
 
