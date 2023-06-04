@@ -104,20 +104,43 @@ class Schedule:
 		if len(self.missions) == 0:
 			return True
 
-		work_time = self.missions[0].end_time - self.missions[0].start_time + (distance_matrix[employee_center_id - 1][centers_nb + self.missions[0].id - 1] / TRAVEL_SPEED)
-		
+		weekly_work_time = self.missions[0].end_time - self.missions[0].start_time + (distance_matrix[employee_center_id - 1][centers_nb + self.missions[0].id - 1] / TRAVEL_SPEED)
+		daily_work_time = weekly_work_time
+		first_daily_mission_start_time = self.missions[0].start_time
+
 		for i in range(1, len(self.missions)):
 
 			if self.missions[i - 1].day == self.missions[i].day:
+				# if they are the same day, computes the travel time between the two missions
 				distance_from_last_mission = distance_matrix[centers_nb + self.missions[i - 1].id - 1][centers_nb + self.missions[i].id - 1]
 				time_from_last_mission = distance_from_last_mission / TRAVEL_SPEED
 
 				if self.missions[i - 1].end_time + time_from_last_mission > self.missions[i].start_time:
 					return False
 				else:
-					work_time += self.missions[i].end_time - self.missions[i].start_time + time_from_last_mission
+					total_mission_time = self.missions[i].end_time - self.missions[i].start_time + time_from_last_mission
+					daily_work_time += total_mission_time
+					weekly_work_time += total_mission_time
+
+			else:
+				# if not the same day, mission[i-1] is the last mission of a day mission[i-1].day, so the employee has to go back to his center
+				last_mission_to_center_travel_time = (distance_matrix[centers_nb + self.missions[i - 1].id - 1][employee_center_id - 1] / TRAVEL_SPEED)
+				daily_work_time += last_mission_to_center_travel_time
+				weekly_work_time += last_mission_to_center_travel_time
+
+				if daily_work_time > MAX_MINUTEES_PER_DAY or self.missions[i - 1].end_time - first_daily_mission_start_time > MAX_DAILY_MINUTES_RANGE:
+					return False
+
+				# then we compute the travel time from the center to the first mission of the day mission[i].day
+				daily_work_time = self.missions[i].end_time - self.missions[i].start_time + (distance_matrix[employee_center_id - 1][centers_nb + self.missions[i].id - 1] / TRAVEL_SPEED)
+				weekly_work_time += daily_work_time
+				first_daily_mission_start_time = self.missions[i].start_time
+
+		last_mission_to_center_travel_time = (distance_matrix[centers_nb + self.missions[-1].id - 1][employee_center_id - 1] / TRAVEL_SPEED)
+		daily_work_time += last_mission_to_center_travel_time
+		weekly_work_time += last_mission_to_center_travel_time
 		
-		if work_time / 60 > MAX_HOURS_PER_DAY:
+		if weekly_work_time > MAX_MINUTEES_PER_WEEK or daily_work_time > MAX_MINUTEES_PER_DAY or self.missions[-1].end_time - first_daily_mission_start_time > MAX_DAILY_MINUTES_RANGE:
 			return False
 		
 		return True
