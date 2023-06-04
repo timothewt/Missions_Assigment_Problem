@@ -7,7 +7,7 @@ class Employee:
 	"""
 
 	id: int  			# id of the employee
-	center_id: str  	# id of the center the employee works at
+	center_id: int  	# id of the center the employee works at
 	skill: str  		# skill of the employee (LPC, LSF)
 	speciality: str  	# speciality of the employee (Musique, Mecanique, ect.)
 	schedule: Schedule  # schedule of the employee's missions

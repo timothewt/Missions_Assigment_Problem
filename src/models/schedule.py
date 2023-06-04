@@ -56,11 +56,25 @@ class Schedule:
 
 	def add_mission(self, mission: Mission) -> None:
 		"""
-		Adds a mission to the schedule
+		Adds a mission to the schedule while keeping it sorted by day and start_hour
+		We consider that the mission had been checked with can_fit_in_schedule() before
 		:param mission: the mission to add
 		"""
-		self.missions.append(mission)
-		self.missions.sort(key=lambda m: (m.day, m.start_time))
+		if len(self.missions) == 0:
+			self.missions.append(mission)
+			return
+		
+		if self.missions[-1].day < mission.day or (self.missions[-1].day == mission.day and self.missions[-1].end_time <= mission.start_time):
+			self.missions.append(mission)
+			return
+
+		for i in range(len(self.missions) - 2, -1, -1):
+			if (self.missions[i + 1].day > mission.day and self.missions[i].day < mission.day) or (self.missions[i + 1].day == mission.day and self.missions[i + 1].start_time >= mission.end_time and self.missions[i].day < mission.day) or (self.missions[i + 1].day > mission.day and self.missions[i].day == mission.day and self.missions[i].end_time <= mission.start_time) or (self.missions[i + 1].day == mission.day and self.missions[i + 1].start_time >= mission.end_time and self.missions[i].day == mission.day and self.missions[i].end_time <= mission.start_time):
+				self.missions.insert(i + 1, mission)
+				return
+
+		self.missions.insert(0, mission)
+		return
 
 
 	def is_empty_for_day(self, day: int) -> bool:
