@@ -40,7 +40,6 @@ class Solution:
 			for mission_id, assigned_employee_id in self.assignments.items():
 				if employee_id == assigned_employee_id:
 					current_mission = employee.center_id + mission_id - 1
-					print(current_mission)
 					dist_employee += distance_matrix[prev_mission][current_mission]
 					prev_mission = current_mission
 			dist_employee += distance_matrix[prev_mission][employee.center_id]
