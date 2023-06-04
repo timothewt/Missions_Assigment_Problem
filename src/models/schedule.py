@@ -94,13 +94,18 @@ class Schedule:
 		return True
 
 
-	def is_valid(self, distance_matrix: list[list[float]], centers_nb: int) -> bool:
+	def is_valid(self, distance_matrix: list[list[float]], centers_nb: int, employee_center_id: int) -> bool:
 		"""
 		Checks if the schedule is valid, i.e. if no mission overlaps another mission
 		:param distance_matrix: the distance matrix
 		:param centers_nb: the number of centers used in the distance matrix indices
 		:return: True if the schedule is valid, False otherwise
 		"""
+		if len(self.missions) == 0:
+			return True
+
+		work_time = self.missions[0].end_time - self.missions[0].start_time + (distance_matrix[employee_center_id - 1][centers_nb + self.missions[0].id - 1] / TRAVEL_SPEED)
+		
 		for i in range(1, len(self.missions)):
 
 			if self.missions[i - 1].day == self.missions[i].day:
@@ -109,6 +114,11 @@ class Schedule:
 
 				if self.missions[i - 1].end_time + time_from_last_mission > self.missions[i].start_time:
 					return False
+				else:
+					work_time += self.missions[i].end_time - self.missions[i].start_time + time_from_last_mission
+		
+		if work_time / 60 > MAX_HOURS_PER_DAY:
+			return False
 		
 		return True
 
