@@ -115,13 +115,12 @@ def pick_best_solutions(solutions: np.ndarray[Solution], employees: dict[int, Em
 			fitness_memo[sol] = (sol.get_fitness_1(), sol.get_fitness_2(employees, missions, distance_matrix, centers_nb), sol.get_fitness_3(employees, missions))
 
 	# sorts by assignment number, -1 * travel cost of employees and corresponding speciality assignments number, in descending order (the -1* is to sort in ascending order)
-
-	intermediate_arr = np.array([fitness_memo[x] for x in solutions], dtype=[('assignments_nb', float), ('cost', float), ('specialities_nb', float)])
-	sorted_indices = np.lexsort((-intermediate_arr['specialities_nb'], intermediate_arr['cost'], -intermediate_arr['assignments_nb']))
+	fitness_arr = np.array([fitness_memo[x] for x in solutions], dtype=[('assignments_nb', float), ('cost', float), ('specialities_nb', float)])
+	sorted_indices = np.lexsort((-fitness_arr['specialities_nb'], fitness_arr['cost'], -fitness_arr['assignments_nb']))
 
 	return solutions[sorted_indices][:number_of_solutions_to_keep]
 
-def crossover(solution1: Solution, solution2: Solution, missions_nb: int) -> list[Solution|Solution]:
+def crossover(solution1: Solution, solution2: Solution, missions_nb: int) -> tuple[Solution|Solution]:
 	"""
 	Performs a crossover between two solutions using uniform crossover
 	:param solution1: first solution
