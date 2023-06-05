@@ -82,7 +82,7 @@ def get_nearest_neighbour_solution(employees: dict[int, Employee], missions: dic
 	return solution
 
 
-def tournament_choice(population: list[Solution], employees: dict[int, Employee], missions: dict[int, Mission], distance_matrix: list[list[float]], k: int, centers_nb: int, fitness_memo: dict[Solution, tuple[int,int,int]]) -> Solution:
+def tournament_choice(population: np.ndarray[Solution], employees: dict[int, Employee], missions: dict[int, Mission], distance_matrix: list[list[float]], k: int, centers_nb: int, fitness_memo: dict[Solution, tuple[int,int,int]]) -> Solution:
 	"""
 	Performs a tournament iteration 
 	:param population: list of solutions
@@ -116,8 +116,8 @@ def pick_best_solutions(solutions: np.ndarray[Solution], employees: dict[int, Em
 
 	# sorts by assignment number, -1 * travel cost of employees and corresponding speciality assignments number, in descending order (the -1* is to sort in ascending order)
 
-	intermediate_arr = np.array([fitness_memo[x] for x in solutions], dtype=[('value1', float), ('value2', float), ('value3', float)])
-	sorted_indices = np.lexsort((-intermediate_arr['value1'], intermediate_arr['value2'], -intermediate_arr['value3']))
+	intermediate_arr = np.array([fitness_memo[x] for x in solutions], dtype=[('assignments_nb', float), ('cost', float), ('specialities_nb', float)])
+	sorted_indices = np.lexsort((-intermediate_arr['specialities_nb'], intermediate_arr['cost'], -intermediate_arr['assignments_nb']))
 
 	return solutions[sorted_indices][:number_of_solutions_to_keep]
 

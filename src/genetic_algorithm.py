@@ -32,14 +32,13 @@ def genetic_algorithm(employees: dict[int, Employee], missions: dict[Mission], c
 	nb_it = 0
 	while time() - start_time < max_execution_time:
 		population = genetic_algorithm_iteration(employees, missions, population, distance_matrix, size, crossover_rate, mutation_rate, k, len(centers), fitness_memo)
-		# print(f"sol: {pick_best_solutions(population, employees, missions, distance_matrix, 1)[0].evaluate(distance_matrix, employees, missions)}")
 		nb_it += 1
 	print(f"  {nb_it} iterations")
 
 	return pick_best_solutions(population, employees, missions, distance_matrix, 1, len(centers), fitness_memo)[0]
 
 
-def genetic_algorithm_iteration(employees: dict[int, Employee], missions: dict[Mission], population: list[Solution], distance_matrix: list[list[float]], size: int, crossover_rate: float, mutation_rate: float, k: int, centers_nb: int, fitness_memo: dict[Solution, tuple[int,int,int]]) -> list[Solution]:
+def genetic_algorithm_iteration(employees: dict[int, Employee], missions: dict[Mission], population: np.ndarray[Solution], distance_matrix: list[list[float]], size: int, crossover_rate: float, mutation_rate: float, k: int, centers_nb: int, fitness_memo: dict[Solution, tuple[int,int,int]]) -> list[Solution]:
 	"""
 	Performs a single iteration of the genetic algorithm
 	:param employees: dict of employees to assign to missions
@@ -65,8 +64,8 @@ def genetic_algorithm_iteration(employees: dict[int, Employee], missions: dict[M
 			child2.mutate(missions, employees)
 
 		if child1.is_valid(employees, missions, distance_matrix, centers_nb):
-			np.append(population, child1)
+			population = np.append(population, child1)
 		if child2.is_valid(employees, missions, distance_matrix, centers_nb):
-			np.append(population, child2)
+			population = np.append(population, child2)
 
 	return pick_best_solutions(population, employees, missions, distance_matrix, size, centers_nb, fitness_memo)
