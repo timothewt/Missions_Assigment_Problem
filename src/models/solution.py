@@ -4,6 +4,7 @@ import json
 from models.employee import Employee
 from models.mission import Mission
 from utils import *
+from config import *
 
 
 class Solution:
@@ -40,7 +41,7 @@ class Solution:
 			total_distance += employee.schedule.distance_traveled
 			employee.reset_schedule()
 
-		return total_distance
+		return int(COST_PER_KM * total_distance)
 
 
 
@@ -119,7 +120,7 @@ class Solution:
 				is_valid = False
 				break
 
-			if employees[self.assignments[mission_id]].schedule.can_fit_in_schedule(mission, distance_matrix, centers_nb):
+			if employees[self.assignments[mission_id]].schedule.can_fit_in_schedule(mission, distance_matrix, centers_nb, employees[self.assignments[mission_id]].center_id):
 				employees[self.assignments[mission_id]].schedule.add_mission(mission, distance_matrix, centers_nb, employees[self.assignments[mission_id]].center_id)
 			else:
 				is_valid = False

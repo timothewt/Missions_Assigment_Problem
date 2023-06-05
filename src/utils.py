@@ -158,5 +158,5 @@ def print_solution_evaluation(evaluation: list[float|float|float]) -> None:
 	:param solution: solution to print
 	"""
 	print(f"Number of missions assigned: {evaluation[0]}")
-	print(f"Total distance traveled: {evaluation[1]}")
+	print(f"Total travel cost of the employees: {evaluation[1]}")
 	print(f"Number of corresponding specialities: {evaluation[2]}")

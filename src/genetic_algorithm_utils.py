@@ -36,8 +36,9 @@ def get_nearest_neighbour_solution(employees: dict[int, Employee], missions: dic
 	"""
 	solution = Solution()
 	centers_nb = len(centers)
+	probability_to_pick_non_optimal_employee = 0.4
 
-	for mission_id, mission in sorted(missions.items(), key=lambda m: (m[1].day, m[1].start_time)):
+	for mission_id, mission in sorted(missions.items(), key=lambda m: (m[1].day, m[1].start_time)):  # assigns the mission in chronological order
 		employees_distances_from_mission: dict[int, float] = {}
 
 		for employee_id, employee in employees.items():
@@ -49,6 +50,10 @@ def get_nearest_neighbour_solution(employees: dict[int, Employee], missions: dic
 				# if the employee has no mission for the current day, he starts from its center
 				employees_distances_from_mission[employee_id] = distance_matrix[employee.center_id - 1][centers_nb + mission_id - 1]
 			else:
+
+				if not employee.schedule.can_fit_in_schedule(mission, distance_matrix, centers_nb, employee.center_id):  # if the employee cannot fit the mission in its schedule, does not consider him
+					continue
+
 				# gets the distance from the last mission of the employee
 				last_mission = employee.schedule.missions[-1]
 
@@ -65,7 +70,7 @@ def get_nearest_neighbour_solution(employees: dict[int, Employee], missions: dic
 			continue
 		else:
 			min_distance = min(employees_distances_from_mission.values())
-			if random() < .3:
+			if random() < probability_to_pick_non_optimal_employee:
 				# 30% of chances to pick an employee among all available ones, who may not be the closest, to add diversity to the initial solutions
 				nearest_employees_ids = [employee_id for employee_id in employees_distances_from_mission.keys()]
 			else:
