@@ -19,7 +19,7 @@ class Schedule:
 		"""
 		Resets the schedule
 		"""
-		self.missions = []
+		self.__init__()
 
 
 	def can_fit_in_schedule(self, mission: Mission, distance_matrix: list[list[bool]], centers_nb: int) -> bool:
@@ -30,28 +30,29 @@ class Schedule:
 		:param centers_nb: the number of centers used in the distance matrix indices
 		:return: True if the mission can fit in the schedule, False otherwise
 		"""
-		for i in range(len(self.missions) - 1, -1, -1):
+		missions_of_day = list(filter(lambda m: m.day == mission.day, self.missions))
 
-			if self.missions[i].day < mission.day:
-				break
+		if len(missions_of_day) == 0:
+			return True
 
-			if self.missions[i].day == mission.day:
-				# considering the travel time between missions
 
-				if self.missions[i].start_time < mission.start_time:
-					# if the mission i starts before the mission we are checking
-					distance_from_mission = distance_matrix[centers_nb + self.missions[i].id - 1][centers_nb + mission.id - 1]
+		if mission.start_time < missions_of_day[0].start_time:
+			# if the mission checked is before the first mission of the day
+			return mission.end_time + (distance_matrix[centers_nb + mission.id - 1][centers_nb + missions_of_day[0].id - 1] / TRAVEL_SPEED) <= missions_of_day[0].start_time
 
-					if self.missions[i].end_time + distance_from_mission / TRAVEL_SPEED > mission.start_time:
-						return False
-				else:
-					# if the mission i ends before the mission we are checking
-					distance_from_mission = distance_matrix[centers_nb + mission.id - 1][centers_nb + self.missions[i].id - 1]
-					
-					if mission.end_time + distance_from_mission / TRAVEL_SPEED > self.missions[i].start_time:
-						return False
+		elif mission.start_time > missions_of_day[-1].start_time:
+			# if the mission checked is after the last mission of the day
+			return missions_of_day[-1].end_time + (distance_matrix[centers_nb + missions_of_day[-1].id - 1][centers_nb + mission.id - 1] / TRAVEL_SPEED) <= mission.start_time
 
-		return True
+		else:
+			# else, it is between two missions during the day
+			for i in range(len(missions_of_day) - 1):
+
+				if mission.start_time > missions_of_day[i].end_time and mission.end_time < missions_of_day[i + 1].start_time:
+					# checks if employee has the time to travel from mission i to the checked mission, and from the checked mission to the mission i + 1
+					return missions_of_day[i].end_time + (distance_matrix[centers_nb + missions_of_day[i].id - 1][centers_nb + mission.id - 1] / TRAVEL_SPEED) <= mission.start_time and mission.end_time + distance_matrix[centers_nb + mission.id - 1][centers_nb + missions_of_day[i + 1].id - 1] / TRAVEL_SPEED <= missions_of_day[i + 1].start_time
+
+		return False  # no time frame found where the mission can fit
 
 
 	def add_mission(self, mission: Mission, distance_matrix: list[list[float]], centers_nb: int, employee_center_id: int) -> None:

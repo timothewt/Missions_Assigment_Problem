@@ -1,4 +1,5 @@
 from copy import deepcopy
+import numpy as np
 from random import choice, random, randint
 from config import *
 from models.solution import Solution
@@ -7,7 +8,7 @@ from models.mission import Mission
 from models.center import Center
 
 
-def generate_initial_population(employees: dict[int, Employee], missions: dict[int, Mission], centers: list[Center], distance_matrix: list[list[float]], size: int) -> list[Solution]:
+def generate_initial_population(employees: dict[int, Employee], missions: dict[int, Mission], centers: list[Center], distance_matrix: list[list[float]], size: int) -> np.ndarray[Solution]:
 	"""
 	Generates an initial population of solutions
 	:param employees: list of employees
@@ -17,7 +18,7 @@ def generate_initial_population(employees: dict[int, Employee], missions: dict[i
 	:param size: size of the population
 	:return: list of valid solutions
 	"""
-	solutions = [None] * size
+	solutions = np.array([None] * size)
 	for i in range(size):
 		# as the nearest neighbour function has random choices, the population will be diverse enough
 		solutions[i] = get_nearest_neighbour_solution(employees, missions, centers, distance_matrix)
@@ -70,11 +71,7 @@ def get_nearest_neighbour_solution(employees: dict[int, Employee], missions: dic
 			else:
 				nearest_employees_ids = [employee_id for employee_id, employee_distance in employees_distances_from_mission.items() if employee_distance == min_distance]  # finds the indices of all the closest employees from the mission
 
-			try:
-				picked_employee = employees[choice(nearest_employees_ids)]
-			except:
-				print(employees_distances_from_mission, min_distance)
-				exit()
+			picked_employee = employees[choice(nearest_employees_ids)]
 
 			solution.assignments[mission_id] = picked_employee.id  # picks a random employee from the closest one to add diversity
 			picked_employee.schedule.add_mission(mission, distance_matrix, centers_nb, picked_employee.center_id)
@@ -85,7 +82,7 @@ def get_nearest_neighbour_solution(employees: dict[int, Employee], missions: dic
 	return solution
 
 
-def tournament_choice(population: list[Solution], employees: dict[int, Employee], missions: dict[int, Mission], distance_matrix: list[list[float]], k: int, centers_nb: int) -> Solution:
+def tournament_choice(population: list[Solution], employees: dict[int, Employee], missions: dict[int, Mission], distance_matrix: list[list[float]], k: int, centers_nb: int, fitness_memo: dict[Solution, tuple[int,int,int]]) -> Solution:
 	"""
 	Performs a tournament iteration 
 	:param population: list of solutions
@@ -93,14 +90,14 @@ def tournament_choice(population: list[Solution], employees: dict[int, Employee]
 	:param k: number of solutions to pick
 	:return: list of solutions
 	"""
-	solutions = [None] * k
+	solutions = np.array([None] * k)
 	for i in range(k):
 		solutions[i] = choice(population)
 
-	return pick_best_solutions(solutions, employees, missions, distance_matrix, 1, centers_nb)[0]
+	return pick_best_solutions(solutions, employees, missions, distance_matrix, 1, centers_nb, fitness_memo)[0]
 
 
-def pick_best_solutions(solutions: list[Solution], employees: dict[int, Employee], missions: dict[int, Mission], distance_matrix: list[list[float]], number_of_solutions_to_keep: int, centers_nb: int) -> list[Solution]:
+def pick_best_solutions(solutions: np.ndarray[Solution], employees: dict[int, Employee], missions: dict[int, Mission], distance_matrix: list[list[float]], number_of_solutions_to_keep: int, centers_nb: int, fitness_memo: dict[Solution, tuple[int,int,int]]) -> np.ndarray[Solution]:
 	"""
 	Picks the best solution in a list using cascade sorting
 	:param solutions: solutions from which we pick the best
@@ -112,11 +109,17 @@ def pick_best_solutions(solutions: list[Solution], employees: dict[int, Employee
 	"""
 	if len(solutions) <= number_of_solutions_to_keep:
 		return solutions
+
+	for sol in solutions:
+		if sol not in fitness_memo:
+			fitness_memo[sol] = (sol.get_fitness_1(), sol.get_fitness_2(employees, missions, distance_matrix, centers_nb), sol.get_fitness_3(employees, missions))
+
 	# sorts by assignment number, -1 * travel cost of employees and corresponding speciality assignments number, in descending order (the -1* is to sort in ascending order)
-	solutions.sort(key=lambda sol: (sol.get_fitness_1(), -sol.get_fitness_2(employees, missions, distance_matrix, centers_nb), sol.get_fitness_3(employees, missions)), reverse=True)
 
-	return solutions[:number_of_solutions_to_keep]
+	intermediate_arr = np.array([fitness_memo[x] for x in solutions], dtype=[('value1', float), ('value2', float), ('value3', float)])
+	sorted_indices = np.lexsort((-intermediate_arr['value1'], intermediate_arr['value2'], -intermediate_arr['value3']))
 
+	return solutions[sorted_indices][:number_of_solutions_to_keep]
 
 def crossover(solution1: Solution, solution2: Solution, missions_nb: int) -> list[Solution|Solution]:
 	"""

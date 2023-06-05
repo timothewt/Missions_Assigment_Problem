@@ -20,7 +20,8 @@ def genetic_algorithm(employees: dict[int, Employee], missions: dict[Mission], c
 	start_time = time()
 	population = generate_initial_population(employees, missions, centers, distance_matrix, size)
 
-	best_initial_evaluation = pick_best_solutions(population, employees, missions, distance_matrix, 1, len(centers))[0].evaluate(distance_matrix, employees, missions, len(centers))
+	fitness_memo = dict()  # used to store the fitness of solutions to avoid computing them multiple times
+	best_initial_evaluation = pick_best_solutions(population, employees, missions, distance_matrix, 1, len(centers), fitness_memo)[0].evaluate(distance_matrix, employees, missions, len(centers), fitness_memo)
 
 	print("  Best initial solution:")
 
@@ -30,15 +31,15 @@ def genetic_algorithm(employees: dict[int, Employee], missions: dict[Mission], c
 
 	nb_it = 0
 	while time() - start_time < max_execution_time:
-		population = genetic_algorithm_iteration(employees, missions, population, distance_matrix, size, crossover_rate, mutation_rate, k, len(centers))
+		population = genetic_algorithm_iteration(employees, missions, population, distance_matrix, size, crossover_rate, mutation_rate, k, len(centers), fitness_memo)
 		# print(f"sol: {pick_best_solutions(population, employees, missions, distance_matrix, 1)[0].evaluate(distance_matrix, employees, missions)}")
 		nb_it += 1
 	print(f"  {nb_it} iterations")
 
-	return pick_best_solutions(population, employees, missions, distance_matrix, 1, len(centers))[0]
+	return pick_best_solutions(population, employees, missions, distance_matrix, 1, len(centers), fitness_memo)[0]
 
 
-def genetic_algorithm_iteration(employees: dict[int, Employee], missions: dict[Mission], population: list[Solution], distance_matrix: list[list[float]], size: int, crossover_rate: float, mutation_rate: float, k: int, centers_nb: int) -> list[Solution]:
+def genetic_algorithm_iteration(employees: dict[int, Employee], missions: dict[Mission], population: list[Solution], distance_matrix: list[list[float]], size: int, crossover_rate: float, mutation_rate: float, k: int, centers_nb: int, fitness_memo: dict[Solution, tuple[int,int,int]]) -> list[Solution]:
 	"""
 	Performs a single iteration of the genetic algorithm
 	:param employees: dict of employees to assign to missions
@@ -54,8 +55,8 @@ def genetic_algorithm_iteration(employees: dict[int, Employee], missions: dict[M
 	"""
 
 	for _ in range(round(crossover_rate * size)):
-		parent1 = tournament_choice(population, employees, missions, distance_matrix, k, centers_nb)
-		parent2 = tournament_choice(population, employees, missions, distance_matrix, k, centers_nb)
+		parent1 = tournament_choice(population, employees, missions, distance_matrix, k, centers_nb, fitness_memo)
+		parent2 = tournament_choice(population, employees, missions, distance_matrix, k, centers_nb, fitness_memo)
 		child1, child2 = crossover(parent1, parent2, len(missions))
 
 		if random() < mutation_rate:
@@ -64,8 +65,8 @@ def genetic_algorithm_iteration(employees: dict[int, Employee], missions: dict[M
 			child2.mutate(missions, employees)
 
 		if child1.is_valid(employees, missions, distance_matrix, centers_nb):
-			population.append(child1)
+			np.append(population, child1)
 		if child2.is_valid(employees, missions, distance_matrix, centers_nb):
-			population.append(child2)
+			np.append(population, child2)
 
-	return pick_best_solutions(population, employees, missions, distance_matrix, size, centers_nb)
+	return pick_best_solutions(population, employees, missions, distance_matrix, size, centers_nb, fitness_memo)

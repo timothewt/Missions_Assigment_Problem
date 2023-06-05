@@ -1,4 +1,6 @@
+from __future__ import annotations
 from random import randint, random
+import json
 from models.employee import Employee
 from models.mission import Mission
 from utils import *
@@ -36,6 +38,7 @@ class Solution:
 		total_distance = 0
 		for _, employee in employees.items():
 			total_distance += employee.schedule.distance_traveled
+			employee.reset_schedule()
 
 		return total_distance
 
@@ -79,7 +82,7 @@ class Solution:
 			self.assignments[gene1], self.assignments[gene2] = self.assignments[gene2], self.assignments[gene1]
 
 
-	def evaluate(self, distance_matrix: list[list[float]], employees: dict[int, Employee], missions: dict[int, Mission], centers_nb: int) -> list[float|float|float]:
+	def evaluate(self, distance_matrix: list[list[float]], employees: dict[int, Employee], missions: dict[int, Mission], centers_nb: int, fitness_memo: dict[Solution, tuple[int,int,int]] = None) -> list[float|float|float]:
 		"""
 		Evaluates the solution, i.e. computes the fitnesses
 		:param distance_matrix: the distance matrix
@@ -87,7 +90,13 @@ class Solution:
 		:param missions: the missions
 		:return: the list of the fitnesses
 		"""
-		return self.get_fitness_1(), self.get_fitness_2(employees, missions, distance_matrix, centers_nb), self.get_fitness_3(employees, missions)
+		if fitness_memo is None:
+			return self.get_fitness_1(), self.get_fitness_2(employees, missions, distance_matrix, centers_nb), self.get_fitness_3(employees, missions)
+
+		if self not in fitness_memo:
+			fitness_memo[self] = (self.get_fitness_1(), self.get_fitness_2(employees, missions, distance_matrix, centers_nb), self.get_fitness_3(employees, missions))
+		
+		return fitness_memo[self]
 
 
 	def is_valid(self, employees: dict[int, Employee], missions: dict[int, Mission], distance_matrix: list[list[float]], centers_nb: int) -> bool:
@@ -134,3 +143,7 @@ class Solution:
 
 	def __repr__(self) -> str:
 		return self.__str__()
+
+
+	def __hash__(self) -> int:
+		return hash(json.dumps(self.assignments, sort_keys=True))
