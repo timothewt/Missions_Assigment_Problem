@@ -4,7 +4,7 @@ from utils import print_solution_evaluation
 from genetic_algorithm_utils import *
 
 
-def genetic_algorithm(employees: dict[int, Employee], missions: dict[Mission], centers: list[Center], distance_matrix: list[list[float]], size: int, crossover_rate: float, mutation_rate: float, max_execution_time: int, k: int) -> Solution:
+def genetic_algorithm(employees: dict[int, Employee], missions: dict[Mission], centers: list[Center], distance_matrix: list[list[float]], size: int, crossover_rate: float, mutation_rate: float, max_execution_time: int, k: int, mutated_genes_per_chromosome_rate: float) -> Solution:
 	"""
 	Performs the genetic algorithm
 	:param employees: dict of employees to assign to missions
@@ -31,14 +31,14 @@ def genetic_algorithm(employees: dict[int, Employee], missions: dict[Mission], c
 
 	nb_it = 0
 	while time() - start_time < max_execution_time:
-		population = genetic_algorithm_iteration(employees, missions, population, distance_matrix, size, crossover_rate, mutation_rate, k, len(centers), fitness_memo)
+		population = genetic_algorithm_iteration(employees, missions, population, distance_matrix, size, crossover_rate, mutation_rate, k, len(centers), fitness_memo, mutated_genes_per_chromosome_rate)
 		nb_it += 1
 	print(f"  {nb_it} iterations")
 
 	return pick_best_solutions(population, employees, missions, distance_matrix, 1, len(centers), fitness_memo)[0]
 
 
-def genetic_algorithm_iteration(employees: dict[int, Employee], missions: dict[Mission], population: np.ndarray[Solution], distance_matrix: list[list[float]], size: int, crossover_rate: float, mutation_rate: float, k: int, centers_nb: int, fitness_memo: dict[Solution, tuple[int,int,int]]) -> list[Solution]:
+def genetic_algorithm_iteration(employees: dict[int, Employee], missions: dict[Mission], population: np.ndarray[Solution], distance_matrix: list[list[float]], size: int, crossover_rate: float, mutation_rate: float, k: int, centers_nb: int, fitness_memo: dict[Solution, tuple[int,int,int]], mutated_genes_per_chromosome_rate: float) -> list[Solution]:
 	"""
 	Performs a single iteration of the genetic algorithm
 	:param employees: dict of employees to assign to missions
@@ -59,9 +59,9 @@ def genetic_algorithm_iteration(employees: dict[int, Employee], missions: dict[M
 		child1, child2 = crossover(parent1, parent2, len(missions))
 
 		if random() < mutation_rate:
-			child1.mutate(missions, employees)
+			child1.mutate(missions, employees, mutated_genes_per_chromosome_rate)
 		if random() < mutation_rate:
-			child2.mutate(missions, employees)
+			child2.mutate(missions, employees, mutated_genes_per_chromosome_rate)
 
 		if child1.is_valid(employees, missions, distance_matrix, centers_nb):
 			population = np.append(population, child1)

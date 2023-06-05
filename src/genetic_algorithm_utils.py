@@ -46,7 +46,7 @@ def get_nearest_neighbour_solution(employees: dict[int, Employee], missions: dic
 			if employee.skill != mission.skill:  # if the skill does not match, does not consider this employee
 				continue
 		
-			if employee.schedule.is_empty_for_day(mission.day):
+			if employee.schedule.is_empty_for_day(mission.day) and employee.schedule.can_fit_in_schedule(mission, distance_matrix, centers_nb, employee.center_id):
 				# if the employee has no mission for the current day, he starts from its center
 				employees_distances_from_mission[employee_id] = distance_matrix[employee.center_id - 1][centers_nb + mission_id - 1]
 			else:

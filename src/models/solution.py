@@ -59,37 +59,38 @@ class Solution:
 		return count
 
 
-	def mutate(self, missions: dict[Mission], employees: dict[int, Employee]) -> None:
+	def mutate(self, missions: dict[Mission], employees: dict[int, Employee], mutated_genes_per_chromosome_rate: float) -> None:
 		"""
 		Mutates the solution to add diversity
 		Selects two genes randomly and swaps them
 		If one of the genes is not assigned, it is assigned to a random employee
 		"""
-		gene1 = randint(1, len(missions))
-		skill = missions[gene1].skill
+		for _ in range(int(mutated_genes_per_chromosome_rate * len(self.assignments))):
+			gene1 = randint(1, len(missions))
+			skill = missions[gene1].skill
 
-		if gene1 not in self.assignments:
-			self.assignments[gene1] = randint(1, len(employees))
-
-			while employees[self.assignments[gene1]].skill != skill:
+			if gene1 not in self.assignments:
 				self.assignments[gene1] = randint(1, len(employees))
 
-		else:
-			gene2 = randint(1, len(missions))
+				while employees[self.assignments[gene1]].skill != skill:
+					self.assignments[gene1] = randint(1, len(employees))
 
-			while missions[gene2].skill != skill or gene2 not in self.assignments or self.assignments[gene1] == self.assignments[gene2]:
-
-				if gene2 not in self.assignments:
-					# choose random employee
-					self.assignments[gene2] = randint(1, len(employees))
-					
-					while employees[self.assignments[gene2]].skill != skill:
-						self.assignments[gene2] = randint(1, len(employees))
-					break
-				else:
-					gene2 = randint(1, len(missions))
 			else:
-				self.assignments[gene1], self.assignments[gene2] = self.assignments[gene2], self.assignments[gene1]
+				gene2 = randint(1, len(missions))
+
+				while missions[gene2].skill != skill or gene2 not in self.assignments or self.assignments[gene1] == self.assignments[gene2]:
+
+					if gene2 not in self.assignments:
+						# choose random employee
+						self.assignments[gene2] = randint(1, len(employees))
+						
+						while employees[self.assignments[gene2]].skill != skill:
+							self.assignments[gene2] = randint(1, len(employees))
+						break
+					else:
+						gene2 = randint(1, len(missions))
+				else:
+					self.assignments[gene1], self.assignments[gene2] = self.assignments[gene2], self.assignments[gene1]
 
 
 	def evaluate(self, distance_matrix: list[list[float]], employees: dict[int, Employee], missions: dict[int, Mission], centers_nb: int, fitness_memo: dict[Solution, tuple[int,int,int]] = None) -> list[float|float|float]:

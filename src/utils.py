@@ -82,18 +82,19 @@ def prompt_instance_parameters() -> list[int|int]:
 	return [missions_nb[instance_id - 1], centers_nb[instance_id - 1]]
 	
 
-def prompt_genetic_algorithm_parameters(default_size: int, default_crossover_rate: float, default_mutation_rate: float, default_max_time: float, default_k: int) -> list[int|float|float|float|int]:
+def prompt_genetic_algorithm_parameters(default_size: int, default_crossover_rate: float, default_mutation_rate: float, default_max_time: float, default_k: int, default_mutated_genes_per_chromosome_rate: float) -> list[int|float|float|float|int|float]:
 	"""
 	Prompts the user to choose the parameters of the genetic algorithm and returns them
 	These are : population size, crossover rate, mutation rate, max execution time, k (number of solutions picked for a tournament)
 	:return: list of parameters
 	"""
 	print("Default parameters:")
-	print("Population size:", default_size)
-	print("Crossover rate:", default_crossover_rate)
-	print("Mutation rate:", default_mutation_rate)
-	print("Max execution time:", default_max_time)
-	print("Number of individuals to pick for a tournament:", default_k)
+	print(f"Population size: {default_size}")
+	print(f"Crossover rate: {default_crossover_rate}")
+	print(f"Mutation rate: {default_mutation_rate}")
+	print(f"Max execution time: {default_max_time}")
+	print(f"Number of individuals to pick for a tournament: {default_k}")
+	print(f"Rate of genes mutated in a chromosome: {default_mutated_genes_per_chromosome_rate}")
 	print("Do you want to input custom parameters or keep the default one (C: custom/D: default) ?")
 	choice = input(">>> ")
 	while choice != 'C' and choice != 'c' and choice != 'D' and choice != 'd':
@@ -101,7 +102,7 @@ def prompt_genetic_algorithm_parameters(default_size: int, default_crossover_rat
 		choice = input(">>> ")
 
 	if choice == "D" or choice == "d":
-		return default_size, default_crossover_rate, default_mutation_rate, default_max_time, default_k
+		return default_size, default_crossover_rate, default_mutation_rate, default_max_time, default_k, default_mutated_genes_per_chromosome_rate
 
 	print("Please enter the parameters of the genetic algorithm:")
 
@@ -135,7 +136,13 @@ def prompt_genetic_algorithm_parameters(default_size: int, default_crossover_rat
 		print("Please enter a valid number (positive integer):")
 		k = int(input(">>> "))
 
-	return size, crossover_rate, mutation_rate, max_execution_time, k
+	print('Rate of genes mutated in a chromosome:')
+	mutated_genes_per_chromosome_rate = float(input(">>> "))
+	while mutated_genes_per_chromosome_rate < 0 or mutated_genes_per_chromosome_rate > 1:
+		print("Please enter a valid rate (between 0 and 1):")
+		mutated_genes_per_chromosome_rate = float(input(">>> "))
+
+	return size, crossover_rate, mutation_rate, max_execution_time, k, mutated_genes_per_chromosome_rate
 		
 
 def print_solution_assignments(solution: Solution, missions: dict[Mission], employees: dict[int, Employee]) -> None:
