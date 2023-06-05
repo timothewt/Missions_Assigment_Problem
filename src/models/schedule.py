@@ -11,12 +11,16 @@ class Schedule:
 	distance_traveled: float  			# distance traveled by the employee to complete his missions
 	weekly_work_time: float  			# hours worked during the week
 	daily_work_time: dict[int, float]  	# hours worked during each day, the key is the day and the value the time worked
+	daily_start_time: dict[int, float]  # start time of the employee's day, the key is the day and the value the time he leaves the center
+	daily_end_time: dict[int, float]  	# end time of the employee's day, the key is the day and the value the time he goes back at the center
 
 	def __init__(self) -> None:
 		self.missions = []
 		self.distance_traveled = 0
 		self.weekly_work_time = 0
 		self.daily_work_time = dict()
+		self.daily_start_time = dict()
+		self.daily_end_time = dict()
 
 
 	def reset_schedule(self) -> None:
@@ -41,11 +45,14 @@ class Schedule:
 		travel_time_bis = 0
 
 		if len(missions_of_day) == 0:
-			added_travel_distance = distance_matrix[employee_center_id - 1][centers_nb + mission.id - 1] + distance_matrix[centers_nb + mission.id - 1][employee_center_id - 1]
+			added_travel_distance = distance_matrix[employee_center_id - 1][centers_nb + mission.id - 1] \
+									+ distance_matrix[centers_nb + mission.id - 1][employee_center_id - 1]
 			
-			return mission_duration + (added_travel_distance / TRAVEL_SPEED) <= MAX_DAILY_WORK_TIME
+			return mission_duration + (added_travel_distance / TRAVEL_SPEED) <= MAX_DAILY_WORK_TIME \
+					and self.weekly_work_time + mission_duration + (added_travel_distance / TRAVEL_SPEED) <= MAX_WEEKLY_WORK_TIME \
+					and mission.end_time + (distance_matrix[centers_nb + mission.id - 1][employee_center_id - 1] / TRAVEL_SPEED) - (mission.start_time - (distance_matrix[employee_center_id - 1][centers_nb + mission.id - 1])) <= MAX_DAILY_TIME_RANGE
 
-		if mission.start_time < missions_of_day[0].start_time:
+		elif mission.end_time < missions_of_day[0].start_time:
 			# if the mission checked is before the first mission of the day
 			added_travel_distance = distance_matrix[employee_center_id - 1][centers_nb + mission.id - 1] \
 									+ distance_matrix[centers_nb + mission.id - 1][centers_nb + missions_of_day[0].id - 1] \
@@ -54,9 +61,10 @@ class Schedule:
 			
 			return mission.end_time + travel_time <= missions_of_day[0].start_time \
 					and mission_duration + (added_travel_distance / TRAVEL_SPEED) + self.daily_work_time[mission.day] <= MAX_DAILY_WORK_TIME \
-					and mission_duration + (added_travel_distance / TRAVEL_SPEED) + self.weekly_work_time <= MAX_WEEKLY_WORK_TIME
+					and mission_duration + (added_travel_distance / TRAVEL_SPEED) + self.weekly_work_time <= MAX_WEEKLY_WORK_TIME \
+					and missions_of_day[-1].end_time + (distance_matrix[centers_nb + missions_of_day[-1].id - 1][employee_center_id - 1] / TRAVEL_SPEED) - (mission.start_time - (distance_matrix[employee_center_id - 1][centers_nb + mission.id - 1])) <= MAX_DAILY_TIME_RANGE
 
-		elif mission.start_time > missions_of_day[-1].start_time:
+		elif mission.start_time > missions_of_day[-1].end_time:
 			# if the mission checked is after the last mission of the day
 			added_travel_distance = distance_matrix[centers_nb + missions_of_day[-1].id - 1][centers_nb + mission.id - 1] \
 									+ distance_matrix[centers_nb + mission.id - 1][employee_center_id - 1] \
@@ -64,7 +72,8 @@ class Schedule:
 			travel_time = distance_matrix[centers_nb + missions_of_day[-1].id - 1][centers_nb + mission.id - 1] / TRAVEL_SPEED
 			return missions_of_day[-1].end_time + travel_time <= mission.start_time \
 					and mission_duration + (added_travel_distance / TRAVEL_SPEED) + self.daily_work_time[mission.day] <= MAX_DAILY_WORK_TIME \
-					and mission_duration + (added_travel_distance / TRAVEL_SPEED) + self.weekly_work_time <= MAX_WEEKLY_WORK_TIME
+					and mission_duration + (added_travel_distance / TRAVEL_SPEED) + self.weekly_work_time <= MAX_WEEKLY_WORK_TIME \
+					and mission.end_time + (distance_matrix[centers_nb + mission.id - 1][employee_center_id - 1] / TRAVEL_SPEED) - (missions_of_day[0].start_time - (distance_matrix[employee_center_id - 1][centers_nb + missions_of_day[0].id - 1])) <= MAX_DAILY_TIME_RANGE
 
 		else:
 			# else, it may fit between two missions during the day
@@ -103,7 +112,8 @@ class Schedule:
 		:param centers_nb: the number of centers used in the distance matrix indices
 		:param employee_center_id: the id of the center where the employee is based
 		"""
-		missions_of_day = [m for m in self.missions if m.day == mission.day]
+		day = mission.day
+		missions_of_day = [m for m in self.missions if m.day == day]
 
 		added_travel_distance = 0
 		mission_insert_index = 0  # index where the mission will be inserted in the schedule
@@ -112,8 +122,10 @@ class Schedule:
 			added_travel_distance = distance_matrix[employee_center_id - 1][centers_nb + mission.id - 1] \
 									+ distance_matrix[centers_nb + mission.id - 1][employee_center_id - 1]
 									# distance center->mission->center
+			self.daily_start_time[day] = mission.start_time - (distance_matrix[employee_center_id - 1][centers_nb + mission.id - 1] / TRAVEL_SPEED)
+			self.daily_end_time[day] = mission.end_time + (distance_matrix[centers_nb + mission.id - 1][employee_center_id - 1] / TRAVEL_SPEED)
 			for i, m in enumerate(self.missions):
-				if m.day > mission.day:
+				if m.day > day:
 					mission_insert_index = i
 					break
 			else:
@@ -126,6 +138,7 @@ class Schedule:
 									+ distance_matrix[centers_nb + mission.id - 1][centers_nb + missions_of_day[0].id - 1] \
 									- distance_matrix[employee_center_id - 1][centers_nb + missions_of_day[0].id - 1]
 									# distance center->mission->first_mission_of_day, minus center->first_mission_of_day
+			self.daily_start_time = mission.start_time - (distance_matrix[employee_center_id - 1][centers_nb + mission.id - 1] / TRAVEL_SPEED)
 			mission_insert_index = self.missions.index(missions_of_day[0])
 
 		elif mission.start_time > missions_of_day[-1].end_time:
@@ -134,6 +147,7 @@ class Schedule:
 									+ distance_matrix[centers_nb + mission.id - 1][employee_center_id - 1] \
 									- distance_matrix[centers_nb + missions_of_day[-1].id - 1][employee_center_id - 1]
 									# distance last_mission_of_day->mission->center, minus last_mission_of_day->center
+			self.daily_end_time = mission.end_time + (distance_matrix[centers_nb + mission.id - 1][employee_center_id - 1] / TRAVEL_SPEED)
 			mission_insert_index = self.missions.index(missions_of_day[-1]) + 1
 
 		else:
@@ -149,11 +163,11 @@ class Schedule:
 					break
 
 		added_work_time = mission.end_time - mission.start_time + added_travel_distance / TRAVEL_SPEED  # time taken to travel
-		if mission.day not in self.daily_work_time:
-			self.daily_work_time[mission.day] = added_work_time
+		if day not in self.daily_work_time:
+			self.daily_work_time[day] = added_work_time
 
 		else:
-			self.daily_work_time[mission.day] += added_work_time
+			self.daily_work_time[day] += added_work_time
 
 		self.weekly_work_time += added_work_time
 		self.distance_traveled += added_travel_distance
