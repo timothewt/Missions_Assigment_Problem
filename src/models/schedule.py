@@ -138,7 +138,7 @@ class Schedule:
 									+ distance_matrix[centers_nb + mission.id - 1][centers_nb + missions_of_day[0].id - 1] \
 									- distance_matrix[employee_center_id - 1][centers_nb + missions_of_day[0].id - 1]
 									# distance center->mission->first_mission_of_day, minus center->first_mission_of_day
-			self.daily_start_time = mission.start_time - (distance_matrix[employee_center_id - 1][centers_nb + mission.id - 1] / TRAVEL_SPEED)
+			self.daily_start_time[day] = mission.start_time - (distance_matrix[employee_center_id - 1][centers_nb + mission.id - 1] / TRAVEL_SPEED)
 			mission_insert_index = self.missions.index(missions_of_day[0])
 
 		elif mission.start_time > missions_of_day[-1].end_time:
@@ -147,7 +147,7 @@ class Schedule:
 									+ distance_matrix[centers_nb + mission.id - 1][employee_center_id - 1] \
 									- distance_matrix[centers_nb + missions_of_day[-1].id - 1][employee_center_id - 1]
 									# distance last_mission_of_day->mission->center, minus last_mission_of_day->center
-			self.daily_end_time = mission.end_time + (distance_matrix[centers_nb + mission.id - 1][employee_center_id - 1] / TRAVEL_SPEED)
+			self.daily_end_time[day] = mission.end_time + (distance_matrix[centers_nb + mission.id - 1][employee_center_id - 1] / TRAVEL_SPEED)
 			mission_insert_index = self.missions.index(missions_of_day[-1]) + 1
 
 		else:
@@ -163,9 +163,9 @@ class Schedule:
 					break
 
 		added_work_time = mission.end_time - mission.start_time + added_travel_distance / TRAVEL_SPEED  # time taken to travel
+
 		if day not in self.daily_work_time:
 			self.daily_work_time[day] = added_work_time
-
 		else:
 			self.daily_work_time[day] += added_work_time
 
@@ -189,10 +189,6 @@ class Schedule:
 				return False
 
 		return True
-
-
-	def get_travel_distance(self, distance_matrix: list[list[float]]):
-		pass
 
 
 	def __str__(self) -> str:
