@@ -78,9 +78,18 @@ class Solution:
 			gene2 = randint(1, len(missions))
 
 			while missions[gene2].skill != skill or gene2 not in self.assignments or self.assignments[gene1] == self.assignments[gene2]:
-				gene2 = randint(1, len(missions))
 
-			self.assignments[gene1], self.assignments[gene2] = self.assignments[gene2], self.assignments[gene1]
+				if gene2 not in self.assignments:
+					# choose random employee
+					self.assignments[gene2] = randint(1, len(employees))
+					
+					while employees[self.assignments[gene2]].skill != skill:
+						self.assignments[gene2] = randint(1, len(employees))
+					break
+				else:
+					gene2 = randint(1, len(missions))
+			else:
+				self.assignments[gene1], self.assignments[gene2] = self.assignments[gene2], self.assignments[gene1]
 
 
 	def evaluate(self, distance_matrix: list[list[float]], employees: dict[int, Employee], missions: dict[int, Mission], centers_nb: int, fitness_memo: dict[Solution, tuple[int,int,int]] = None) -> list[float|float|float]:
