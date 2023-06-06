@@ -65,7 +65,7 @@ class Solution:
 		Selects two genes randomly and swaps them
 		If one of the genes is not assigned, it is assigned to a random employee
 		"""
-		for _ in range(int(mutated_genes_per_chromosome_rate * len(self.assignments))):
+		for _ in range(randint(1, max(int(mutated_genes_per_chromosome_rate * len(self.assignments)), 1))):
 			gene1 = randint(1, len(missions))
 			skill = missions[gene1].skill
 
@@ -77,18 +77,15 @@ class Solution:
 
 			else:
 				gene2 = randint(1, len(missions))
+				while missions[gene2].skill != skill:
+					gene2 = randint(1, len(missions))
 
-				while missions[gene2].skill != skill or gene2 not in self.assignments or self.assignments[gene1] == self.assignments[gene2]:
+				if gene2 not in self.assignments:
+					self.assignments[gene2] = self.assignments[gene1]
 
-					if gene2 not in self.assignments:
-						# choose random employee
-						self.assignments[gene2] = randint(1, len(employees))
-						
-						while employees[self.assignments[gene2]].skill != skill:
-							self.assignments[gene2] = randint(1, len(employees))
-						break
-					else:
-						gene2 = randint(1, len(missions))
+					if random() < .5:
+						self.assignments.pop(gene1)
+
 				else:
 					self.assignments[gene1], self.assignments[gene2] = self.assignments[gene2], self.assignments[gene1]
 
@@ -146,6 +143,14 @@ class Solution:
 		copy = Solution()
 		copy.assignments = self.assignments.copy()
 		return copy
+		
+
+	def __eq__(self, other: Solution) -> bool:
+		return self.assignments == other.assignments
+
+
+	def __neq__(self, other: Solution) -> bool:
+		return not self.__eq__(other)
 
 
 	def __str__(self) -> str:

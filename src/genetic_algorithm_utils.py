@@ -36,7 +36,7 @@ def get_nearest_neighbour_solution(employees: dict[int, Employee], missions: dic
 	"""
 	solution = Solution()
 	centers_nb = len(centers)
-	probability_to_pick_non_optimal_employee = 0.4
+	probability_to_pick_non_optimal_employee = .5
 
 	for mission_id, mission in sorted(missions.items(), key=lambda m: (m[1].day, m[1].start_time)):  # assigns the mission in chronological order
 		employees_distances_from_mission: dict[int, float] = {}
@@ -110,20 +110,24 @@ def pick_best_solutions(solutions: np.ndarray[Solution], employees: dict[int, Em
 	:param missions: dict of missions
 	:param distance_matrix: matrix of distances between center-center, centers-missions, missions-missions
 	:param number_of_solutions_to_keep: number of solutions to keep
+	:param centers_nb: number of centers
+	:param fitness_memo: memoization dict for fitnesses
 	:return: the best solution in the list
 	"""
-	if len(solutions) <= number_of_solutions_to_keep:
-		return solutions
 
 	for sol in solutions:
 		if sol not in fitness_memo:
 			fitness_memo[sol] = (sol.get_fitness_1(), sol.get_fitness_2(employees, missions, distance_matrix, centers_nb), sol.get_fitness_3(employees, missions))
 
+	if number_of_solutions_to_keep == 1:
+		return [max(solutions, key=lambda sol: (fitness_memo[sol][0], -fitness_memo[sol][1], fitness_memo[sol][2]))]
+
 	# sorts by assignment number, -1 * travel cost of employees and corresponding speciality assignments number, in descending order (the -1* is to sort in ascending order)
 	fitness_arr = np.array([fitness_memo[x] for x in solutions], dtype=[('assignments_nb', float), ('cost', float), ('specialities_nb', float)])
 	sorted_indices = np.lexsort((-fitness_arr['specialities_nb'], fitness_arr['cost'], -fitness_arr['assignments_nb']))
-
+	
 	return solutions[sorted_indices][:number_of_solutions_to_keep]
+
 
 def crossover(solution1: Solution, solution2: Solution, missions_nb: int) -> tuple[Solution|Solution]:
 	"""

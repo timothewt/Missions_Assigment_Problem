@@ -21,21 +21,28 @@ def genetic_algorithm(employees: dict[int, Employee], missions: dict[Mission], c
 	population = generate_initial_population(employees, missions, centers, distance_matrix, size)
 
 	fitness_memo = dict()  # used to store the fitness of solutions to avoid computing them multiple times
-	best_initial_evaluation = pick_best_solutions(population, employees, missions, distance_matrix, 1, len(centers), fitness_memo)[0].evaluate(distance_matrix, employees, missions, len(centers), fitness_memo)
+	best_solution = pick_best_solutions(population, employees, missions, distance_matrix, 1, len(centers), fitness_memo)[0]
+	fitness_memo[best_solution] = best_solution.evaluate(distance_matrix, employees, missions, len(centers), fitness_memo)
 
 	print("  Best initial solution:")
 
-	print_solution_evaluation(best_initial_evaluation)
+	print_solution_evaluation(fitness_memo[best_solution])
 
 	print("\nRunning genetic algorithm...")
 
 	nb_it = 0
 	while time() - start_time < max_execution_time:
 		population = genetic_algorithm_iteration(employees, missions, population, distance_matrix, size, crossover_rate, mutation_rate, k, len(centers), fitness_memo, mutated_genes_per_chromosome_rate)
+
+		new_best = max(best_solution, population[0], key=lambda sol: (fitness_memo[sol][0], -fitness_memo[sol][1], fitness_memo[sol][2]))
+		if fitness_memo[new_best] != fitness_memo[best_solution]:
+			best_solution = new_best
+			print(f"  New best solution: {fitness_memo[best_solution]}")
+		
 		nb_it += 1
 	print(f"  {nb_it} iterations")
 
-	return pick_best_solutions(population, employees, missions, distance_matrix, 1, len(centers), fitness_memo)[0]
+	return best_solution
 
 
 def genetic_algorithm_iteration(employees: dict[int, Employee], missions: dict[Mission], population: np.ndarray[Solution], distance_matrix: list[list[float]], size: int, crossover_rate: float, mutation_rate: float, k: int, centers_nb: int, fitness_memo: dict[Solution, tuple[int,int,int]], mutated_genes_per_chromosome_rate: float) -> list[Solution]:
@@ -67,5 +74,5 @@ def genetic_algorithm_iteration(employees: dict[int, Employee], missions: dict[M
 			population = np.append(population, child1)
 		if child2.is_valid(employees, missions, distance_matrix, centers_nb):
 			population = np.append(population, child2)
-
+			
 	return pick_best_solutions(population, employees, missions, distance_matrix, size, centers_nb, fitness_memo)
