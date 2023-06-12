@@ -6,6 +6,7 @@ from models.solution import Solution
 from models.employee import Employee
 from models.mission import Mission
 from models.center import Center
+from utils import print_solution_evaluation
 
 
 def generate_initial_population(employees: dict[int, Employee], missions: dict[int, Mission], centers: list[Center], distance_matrix: list[list[float]], size: int) -> np.ndarray[Solution]:
@@ -104,7 +105,7 @@ def tournament_choice(population: np.ndarray[Solution], employees: dict[int, Emp
 
 def pick_best_solutions(solutions: np.ndarray[Solution], employees: dict[int, Employee], missions: dict[int, Mission], distance_matrix: list[list[float]], number_of_solutions_to_keep: int, centers_nb: int, fitness_memo: dict[Solution, tuple[int,int,int]]) -> np.ndarray[Solution]:
 	"""
-	Picks the best solution in a list using cascade sorting
+	Picks the best solution in a list using the solutions fitnesses
 	:param solutions: solutions from which we pick the best
 	:param employees: dict of employees
 	:param missions: dict of missions
@@ -117,16 +118,15 @@ def pick_best_solutions(solutions: np.ndarray[Solution], employees: dict[int, Em
 
 	for sol in solutions:
 		if sol not in fitness_memo:
-			fitness_memo[sol] = (sol.get_fitness_1(), sol.get_fitness_2(employees, missions, distance_matrix, centers_nb), sol.get_fitness_3(employees, missions))
+			fitness_memo[sol] = sol.get_fitness(employees, missions, distance_matrix, centers_nb)
 
 	if number_of_solutions_to_keep == 1:
-		return [max(solutions, key=lambda sol: (fitness_memo[sol][0], -fitness_memo[sol][1], fitness_memo[sol][2]))]
+		return [max(solutions, key=lambda sol: fitness_memo[sol])]
 
-	# sorts by assignment number, -1 * travel cost of employees and corresponding speciality assignments number, in descending order (the -1* is to sort in ascending order)
-	fitness_arr = np.array([fitness_memo[x] for x in solutions], dtype=[('assignments_nb', float), ('cost', float), ('specialities_nb', float)])
-	sorted_indices = np.lexsort((-fitness_arr['specialities_nb'], fitness_arr['cost'], -fitness_arr['assignments_nb']))
-	
-	return solutions[sorted_indices][:number_of_solutions_to_keep]
+	sorted_indices = np.argsort([-fitness_memo[sol] for sol in solutions], kind="heapsort")  # "-evaluation" to sort in descending order
+	sorted_solutions = solutions[sorted_indices]
+
+	return sorted_solutions[:number_of_solutions_to_keep]
 
 
 def crossover(solution1: Solution, solution2: Solution, missions_nb: int) -> tuple[Solution|Solution]:

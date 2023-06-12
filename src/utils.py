@@ -159,11 +159,21 @@ def print_solution_assignments(solution: Solution, missions: dict[Mission], empl
 			print(f"Mission {missions[i].id} not assigned")
 
 
-def print_solution_evaluation(evaluation: list[float|float|float]) -> None:
+def get_solution_individual_fitnesses(evaluation: float) -> tuple[int|int|int]:
+	"""
+	Returns the individual fitnesses of a solution
+	:param evaluation: evaluation of the solution
+	:return: tuple of the individual fitnesses
+	"""
+	return int(evaluation / 1e9), int(1e6 - int(evaluation % 1e9 / 1e3)), int(evaluation % 1e3)
+
+
+def print_solution_evaluation(evaluation: float) -> None:
 	"""
 	Prints the solution evaluation in a readable way
 	:param solution: solution to print
 	"""
-	print(f"Number of missions assigned: {evaluation[0]}")
-	print(f"Total travel cost of the employees: {evaluation[1]}")
-	print(f"Number of corresponding specialities: {evaluation[2]}")
+	individual_fitnesses = get_solution_individual_fitnesses(evaluation)
+	print(f"Number of missions assigned: {individual_fitnesses[0]}")
+	print(f"Total travel cost of the employees: {individual_fitnesses[1]}")
+	print(f"Number of corresponding specialities: {individual_fitnesses[2]}")

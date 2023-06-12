@@ -1,6 +1,6 @@
 from time import time
 from models.solution import Solution
-from utils import print_solution_evaluation
+from utils import print_solution_evaluation, get_solution_individual_fitnesses
 from genetic_algorithm_utils import *
 
 
@@ -34,10 +34,10 @@ def genetic_algorithm(employees: dict[int, Employee], missions: dict[Mission], c
 	while time() - start_time < max_execution_time:
 		population = genetic_algorithm_iteration(employees, missions, population, distance_matrix, size, crossover_rate, mutation_rate, k, len(centers), fitness_memo, mutated_genes_per_chromosome_rate)
 
-		new_best = max(best_solution, population[0], key=lambda sol: (fitness_memo[sol][0], -fitness_memo[sol][1], fitness_memo[sol][2]))
+		new_best = max(best_solution, population[0], key=lambda sol: (fitness_memo[sol]))
 		if fitness_memo[new_best] != fitness_memo[best_solution]:
 			best_solution = new_best
-			print(f"  New best solution: {fitness_memo[best_solution]}")
+			print(f"  New best solution: {get_solution_individual_fitnesses(fitness_memo[best_solution])}")
 		
 		nb_it += 1
 	print(f"  {nb_it} iterations")

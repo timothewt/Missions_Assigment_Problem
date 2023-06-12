@@ -19,20 +19,29 @@ class Solution:
 		self.assignments = dict()
 
 
-	def get_fitness_1(self) -> float:
+	def get_fitness(self, employees: dict[int, Employee], missions: dict[int, Mission], distance_matrix: list[list[float]], centers_nb: int) -> float:
 		"""
-		Computes the fitness corresponding to the number of missions assigned
-		:return: the number of missions assigned
-		"""
-		return len(self.assignments)
+		Computes all the fitnesses of the employees in one integer
+		Using powers of ten, we can still use cascade sorting. 
+		The first fitness is the most important, the second is less important, etc.
+		The assignments number, the first, is the dominant number, multiplied by 10^9
+		Then, to sort the travel cost (second fitness) in the opposite order of the two others, we take 10^9 - the travel cost in thousands.
+		Finally, the number of specialities is the third fitness, it is stored in the last 3 digits.
 
+		Example : 75 missions assigned, 1205 travel cost, 30 corresponding specialities:
+		75 * 10^9 + (10^9 - 1205 * 10^3) + 30 = 75,998,795,030
 
-	def get_fitness_2(self, employees: dict[int, Employee], missions: dict[int, Mission], distance_matrix: list[list[float]], centers_nb: int) -> float:
+		:param employees: list of employees
+		:param missions: dict of missions
+		:param distance_matrix: matrix of distances between center-center, centers-missions, missions-missions
+		:param centers_nb: number of centers
+		:return: the fitness of the solution
 		"""
-		Computes the distance fitness, i.e. the total distance traveled
-		:param distance_matrix: the distance matrix
-		:return: the distance fitness
-		"""
+
+		# Fitness one: number of missions assigned
+		nb_assignments = len(self.assignments)
+
+		# Fitness two: travel cost for employees
 		for mission_id, assigned_employee_id in self.assignments.items():
 			employees[assigned_employee_id].schedule.add_mission(missions[mission_id], distance_matrix, centers_nb, employees[assigned_employee_id].center_id)
 
@@ -41,22 +50,18 @@ class Solution:
 			total_distance += employee.schedule.distance_traveled
 			employee.reset_schedule()
 
-		return int(COST_PER_KM * total_distance)
+		travel_cost = int(COST_PER_KM * total_distance)
 
 
-
-	def get_fitness_3(self, employees: dict[int, Employee], missions: dict[int, Mission]) -> float:
-		"""
-		Computes the specialities fitness, i.e. the number of corresponding speciality between missions and employees
-		:param employees: the employees
-		:param missions: the missions
-		:return: the specialities fitness
-		"""
+		# Fitness three: number of specialities
 		count = len(self.assignments)
 		for mission_id, assigned_employee_id in self.assignments.items():
 			if employees[assigned_employee_id].speciality != missions[mission_id].speciality:
 				count -= 1
-		return count
+
+		specialities_count = count
+
+		return int(nb_assignments * 1e9 + (1e9 - travel_cost * 1e3) + specialities_count)
 
 
 	def mutate(self, missions: dict[Mission], employees: dict[int, Employee], mutated_genes_per_chromosome_rate: float) -> None:
@@ -90,7 +95,7 @@ class Solution:
 					self.assignments[gene1], self.assignments[gene2] = self.assignments[gene2], self.assignments[gene1]
 
 
-	def evaluate(self, distance_matrix: list[list[float]], employees: dict[int, Employee], missions: dict[int, Mission], centers_nb: int, fitness_memo: dict[Solution, tuple[int,int,int]] = None) -> list[float|float|float]:
+	def evaluate(self, distance_matrix: list[list[float]], employees: dict[int, Employee], missions: dict[int, Mission], centers_nb: int, fitness_memo: dict[Solution, int] = None) -> list[float|float|float]:
 		"""
 		Evaluates the solution, i.e. computes the fitnesses
 		:param distance_matrix: the distance matrix
@@ -99,10 +104,10 @@ class Solution:
 		:return: the list of the fitnesses
 		"""
 		if fitness_memo is None:
-			return self.get_fitness_1(), self.get_fitness_2(employees, missions, distance_matrix, centers_nb), self.get_fitness_3(employees, missions)
+			return self.get_fitness(employees, missions, distance_matrix, centers_nb)
 
 		if self not in fitness_memo:
-			fitness_memo[self] = (self.get_fitness_1(), self.get_fitness_2(employees, missions, distance_matrix, centers_nb), self.get_fitness_3(employees, missions))
+			fitness_memo[self] = self.get_fitness()
 		
 		return fitness_memo[self]
 
