@@ -75,7 +75,7 @@ def prompt_instance_parameters() -> list[int|int]:
 		print(f"{i+1} - {missions_nb[i]} missions, {centers_nb[i]} centers")
 
 	instance_id = int(input('>>> '))
-	while instance_id < 1 or instance_id > 7:
+	while instance_id < 1 or instance_id > len(missions_nb):
 		print(f"Please enter a valid number (1-{len(missions_nb)}):")
 		instance_id = int(input('>>> '))
 
