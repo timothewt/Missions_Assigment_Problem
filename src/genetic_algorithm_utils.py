@@ -117,7 +117,7 @@ def pick_best_solutions(solutions: np.ndarray[Solution], employees: dict[int, Em
 	"""
 
 	for sol in solutions:
-		if sol not in fitness_memo:
+		if not fitness_memo.get(sol):
 			fitness_memo[sol] = sol.get_fitness(employees, missions, distance_matrix, centers_nb)
 
 	if number_of_solutions_to_keep == 1:
@@ -129,7 +129,7 @@ def pick_best_solutions(solutions: np.ndarray[Solution], employees: dict[int, Em
 	return sorted_solutions[:number_of_solutions_to_keep]
 
 
-def crossover(solution1: Solution, solution2: Solution, missions_nb: int) -> tuple[Solution|Solution]:
+def crossover(solution1: Solution, solution2: Solution, missions_nb: int) -> tuple[Solution,Solution]:
 	"""
 	Performs a crossover between two solutions using uniform crossover
 	:param solution1: first solution
@@ -141,8 +141,8 @@ def crossover(solution1: Solution, solution2: Solution, missions_nb: int) -> tup
 
 	for mission_id in range(1, missions_nb + 1):
 		gene_mask = randint(0, 1)
-		assignment1 = solution1.assignments[mission_id] if mission_id in solution1.assignments else None
-		assignment2 = solution2.assignments[mission_id] if mission_id in solution2.assignments else None
+		assignment1 = solution1.assignments.get(mission_id)  # gives None if mission_id not in assignments
+		assignment2 = solution2.assignments.get(mission_id)  
 
 		if gene_mask:
 			if assignment1 is not None:

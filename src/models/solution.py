@@ -107,7 +107,7 @@ class Solution:
 			return self.get_fitness(employees, missions, distance_matrix, centers_nb)
 
 		if self not in fitness_memo:
-			fitness_memo[self] = self.get_fitness()
+			fitness_memo[self] = self.get_fitness(employees, missions, distance_matrix, centers_nb)
 		
 		return fitness_memo[self]
 

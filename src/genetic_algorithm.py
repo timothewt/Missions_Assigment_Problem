@@ -60,16 +60,20 @@ def genetic_algorithm_iteration(employees: dict[int, Employee], missions: dict[M
 	:return: the best solution of the population
 	"""
 
-	for _ in range(round(crossover_rate * size)):
+	for _ in range(round(crossover_rate * size / 2)):
+
+		# choosing the parents for the crossover
 		parent1 = tournament_choice(population, employees, missions, distance_matrix, k, centers_nb, fitness_memo)
 		parent2 = tournament_choice(population, employees, missions, distance_matrix, k, centers_nb, fitness_memo)
 		child1, child2 = crossover(parent1, parent2, len(missions))
 
+		# mutating the children
 		if random() < mutation_rate:
 			child1.mutate(missions, employees, mutated_genes_per_chromosome_rate)
 		if random() < mutation_rate:
 			child2.mutate(missions, employees, mutated_genes_per_chromosome_rate)
 
+		# adding the children to the population if they are valid
 		if child1.is_valid(employees, missions, distance_matrix, centers_nb):
 			population = np.append(population, child1)
 		if child2.is_valid(employees, missions, distance_matrix, centers_nb):
