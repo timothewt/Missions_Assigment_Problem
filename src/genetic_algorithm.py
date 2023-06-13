@@ -37,7 +37,7 @@ def genetic_algorithm(employees: dict[int, Employee], missions: dict[Mission], c
 		new_best = max(best_solution, population[0], key=lambda sol: (fitness_memo[sol]))
 		if fitness_memo[new_best] != fitness_memo[best_solution]:
 			best_solution = new_best
-			print(f"  New best solution: {get_solution_individual_fitnesses(fitness_memo[best_solution])}")
+			print(f"  New best solution: {get_solution_individual_fitnesses(fitness_memo[best_solution])} at iteration {nb_it}")
 		
 		nb_it += 1
 	print(f"  {nb_it} iterations")

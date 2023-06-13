@@ -37,7 +37,7 @@ def get_nearest_neighbour_solution(employees: dict[int, Employee], missions: dic
 	"""
 	solution = Solution()
 	centers_nb = len(centers)
-	probability_to_pick_non_optimal_employee = .5
+	probability_to_pick_non_optimal_employee = .8
 
 	for mission_id, mission in sorted(missions.items(), key=lambda m: (m[1].day, m[1].start_time)):  # assigns the mission in chronological order
 		employees_distances_from_mission: dict[int, float] = {}
