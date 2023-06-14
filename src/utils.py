@@ -162,7 +162,7 @@ def save_solution_assignments(solution: Solution, missions: dict[Mission], emplo
 	file_name = "solution0.csv"
 
 	if (instance_path / file_name).exists():
-		file_name = f"solution{file_name[9]}.csv"
+		file_name = f"solution{file_name[8]}.csv"
 
 	with open(instance_path / file_name, 'w') as f:
 		f.write(f"assignments_nb,travel_cost,corresponding_specialities_nb\n")
