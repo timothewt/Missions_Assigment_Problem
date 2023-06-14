@@ -32,14 +32,15 @@ def genetic_algorithm(employees: dict[int, Employee], missions: dict[Mission], c
 
 	nb_it = 0
 	while time() - start_time < max_execution_time:
+		nb_it += 1
+
 		population = genetic_algorithm_iteration(employees, missions, population, distance_matrix, size, crossover_rate, mutation_rate, k, len(centers), fitness_memo, mutated_genes_per_chromosome_rate)
 
 		new_best = max(best_solution, population[0], key=lambda sol: (fitness_memo[sol]))
 		if fitness_memo[new_best] != fitness_memo[best_solution]:
 			best_solution = new_best
 			print(f"  New best solution: {get_solution_individual_fitnesses(fitness_memo[best_solution])} at iteration {nb_it}")
-		
-		nb_it += 1
+			
 	print(f"  {nb_it} iterations")
 
 	return best_solution
