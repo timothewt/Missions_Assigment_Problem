@@ -145,6 +145,36 @@ def prompt_genetic_algorithm_parameters(default_size: int, default_crossover_rat
 	return size, crossover_rate, mutation_rate, max_execution_time, k, mutated_genes_per_chromosome_rate
 		
 
+def save_solution_assignments(solution: Solution, missions: dict[Mission], employees: dict[int, Employee], instance_path: Path, evaluation: float) -> None:
+	"""
+	Saves the assignments of a solution in a .csv file
+
+	:param solution: solution to save
+	:param missions: missions of the instance
+	:param employees: employees of the instance
+	:param instance_path: path to the instance
+	:param evaluation: evaluation of the solution
+	"""
+
+	fitnesses = get_solution_individual_fitnesses(evaluation)
+
+	# make sure to create a new file if there is already a solution.csv file
+	file_name = "solution0.csv"
+
+	if (instance_path / file_name).exists():
+		file_name = f"solution{file_name[9]}.csv"
+
+	with open(instance_path / file_name, 'w') as f:
+		f.write(f"assignments_nb,travel_cost,corresponding_specialities_nb\n")
+		f.write(f"{fitnesses[0]},{fitnesses[1]},{fitnesses[2]}\n")
+		f.write(f"mission_id,employee_id,center_id\n")
+		for i in range(1, len(missions) + 1):
+			if i in solution.assignments:
+				f.write(f"{missions[i].id},{solution.assignments[i]},{employees[solution.assignments[i]].center_id}\n")
+			else:
+				f.write(f"{missions[i].id},0,0\n")
+
+
 def print_solution_assignments(solution: Solution, missions: dict[Mission], employees: dict[int, Employee]) -> None:
 	"""
 	Prints the solution in a readable way
