@@ -60,6 +60,8 @@ def genetic_algorithm_iteration(employees: dict[int, Employee], missions: dict[M
 	:return: the best solution of the population
 	"""
 
+	children = []
+
 	for _ in range(round(crossover_rate * size / 2)):
 
 		# choosing the parents for the crossover
@@ -75,8 +77,8 @@ def genetic_algorithm_iteration(employees: dict[int, Employee], missions: dict[M
 
 		# adding the children to the population if they are valid
 		if child1.is_valid(employees, missions, distance_matrix, centers_nb):
-			population = np.append(population, child1)
+			children.append(child1)
 		if child2.is_valid(employees, missions, distance_matrix, centers_nb):
-			population = np.append(population, child2)
+			children.append(child2)
 			
-	return pick_best_solutions(population, employees, missions, distance_matrix, size, centers_nb, fitness_memo)
+	return pick_best_solutions(np.append(population, np.array(children)), employees, missions, distance_matrix, size, centers_nb, fitness_memo)
