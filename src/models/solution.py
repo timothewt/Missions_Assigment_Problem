@@ -61,7 +61,7 @@ class Solution:
 
 		specialities_count = count
 
-		return int(nb_assignments * 1e9 + (1e9 - travel_cost * 1e3) + specialities_count)
+		return int(nb_assignments * 1e7 + (1e7 - travel_cost * 1e3) + specialities_count)
 
 
 	def mutate(self, missions: dict[Mission], employees: dict[int, Employee], mutated_genes_per_chromosome_rate: float) -> None:
