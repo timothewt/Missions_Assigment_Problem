@@ -22,7 +22,7 @@ if __name__ == "__main__":
 
 	print("\nBest solution found:")
 
-	# save_solution_assignments(solution, missions, employees, instance_path, evaluation)
+	save_solution_assignments(solution, missions, employees, instance_path, evaluation)
 
 	print_solution_evaluation(evaluation)
 	

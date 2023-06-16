@@ -195,8 +195,7 @@ def get_solution_individual_fitnesses(evaluation: float) -> tuple[int|int|int]:
 	:param evaluation: evaluation of the solution
 	:return: tuple of the individual fitnesses
 	"""
-	return int(evaluation // 1e7), int(1e4 - int(evaluation % 1e7 / 1e3)), int(evaluation % 1e3)
-	return int(evaluation / 1e9), int(1e6 - int(evaluation % 1e9 / 1e3)), int(evaluation % 1e3)
+	return int(evaluation // 1e8), int(1e5 - int(evaluation % 1e8 / 1e3)), int(evaluation % 1e3)
 
 
 def print_solution_evaluation(evaluation: float) -> None:

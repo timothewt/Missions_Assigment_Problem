@@ -24,12 +24,12 @@ class Solution:
 		Computes all the fitnesses of the employees in one integer
 		Using powers of ten, we can still use cascade sorting. 
 		The first fitness is the most important, the second is less important, etc.
-		The assignments number, the first, is the dominant number, multiplied by 10^9
-		Then, to sort the travel cost (second fitness) in the opposite order of the two others, we take 10^9 - the travel cost in thousands.
+		The assignments number, the first, is the dominant number, multiplied by 10^8
+		Then, to sort the travel cost (second fitness) in the opposite order of the two others, we take 10^8 - the travel cost in thousands.
 		Finally, the number of specialities is the third fitness, it is stored in the last 3 digits.
 
 		Example : 75 missions assigned, 1205 travel cost, 30 corresponding specialities:
-		75 * 10^9 + (10^9 - 1205 * 10^3) + 30 = 75,998,795,030
+		75 * 10^8 + (10^8 - 1205 * 10^3) + 30 = 7,598,795,030
 
 		:param employees: list of employees
 		:param missions: dict of missions
@@ -61,7 +61,7 @@ class Solution:
 
 		specialities_count = count
 
-		return int(nb_assignments * 1e7 + (1e7 - travel_cost * 1e3) + specialities_count)
+		return int(nb_assignments * 1e8 + (1e8 - travel_cost * 1e3) + specialities_count)
 
 
 	def mutate(self, missions: dict[Mission], employees: dict[int, Employee], mutated_genes_per_chromosome_rate: float) -> None:
@@ -142,12 +142,6 @@ class Solution:
 			employee.reset_schedule()
 			
 		return is_valid
-
-
-	def copy(self):
-		copy = Solution()
-		copy.assignments = self.assignments.copy()
-		return copy
 		
 
 	def __eq__(self, other: Solution) -> bool:
