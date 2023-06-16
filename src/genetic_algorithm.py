@@ -58,7 +58,7 @@ def genetic_algorithm_iteration(employees: dict[int, Employee], missions: dict[M
 	:param mutation_rate: probability of mutation
 	:param k: number of individuals to consider in tournament selection
 	:param centers_nb: number of centers
-	:return: the best solution of the population
+	:return: the new population
 	"""
 
 	children = []

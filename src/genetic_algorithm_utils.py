@@ -123,7 +123,7 @@ def pick_best_solutions(solutions: np.ndarray[Solution], employees: dict[int, Em
 	if number_of_solutions_to_keep == 1:
 		return [max(solutions, key=lambda sol: fitness_memo[sol])]
 
-	sorted_indices = np.argsort(np.array([-fitness_memo[sol] for sol in solutions], dtype=int), kind="heapsort")  # "-evaluation" to sort in descending order
+	sorted_indices = np.argsort(np.array([-fitness_memo[sol] for sol in solutions], dtype=np.int64), kind="heapsort")  # "-evaluation" to sort in descending order
 	sorted_solutions = solutions[sorted_indices]
 
 	return sorted_solutions[:number_of_solutions_to_keep]

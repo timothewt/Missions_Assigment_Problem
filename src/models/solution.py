@@ -101,7 +101,7 @@ class Solution:
 		:param distance_matrix: the distance matrix
 		:param employees: the employees
 		:param missions: the missions
-		:return: the list of the fitnesses
+		:return: the fitness of the solution
 		"""
 		if fitness_memo is None:
 			return self.get_fitness(employees, missions, distance_matrix, centers_nb)
