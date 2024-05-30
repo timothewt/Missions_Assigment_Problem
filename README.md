@@ -1,4 +1,6 @@
-# IT45 - Assignment Problem
+# Missions Assignment Problem
+
+The objective of this operational research project is to provide an optimized schedule for employees assigned to missions. 
 
 ## Requirements
 - NumPy 1.24.3
